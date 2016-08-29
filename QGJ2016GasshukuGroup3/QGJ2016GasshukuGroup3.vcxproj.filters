@@ -26,6 +26,9 @@
     <ClCompile Include="MapEditor.cpp">
       <Filter>ソース ファイル</Filter>
     </ClCompile>
+    <ClCompile Include="title.cpp">
+      <Filter>ソース ファイル</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Shape.h">
@@ -43,9 +46,6 @@
     <ClInclude Include="MemberCheck.h">
       <Filter>ヘッダー ファイル</Filter>
     </ClInclude>
-    <ClCompile Include="Aonshiki.cpp">
-      <Filter>ソース ファイル</Filter>
-    </ClCompile>
     <ClInclude Include="MapEditor.h">
       <Filter>ヘッダー ファイル</Filter>
     </ClInclude>

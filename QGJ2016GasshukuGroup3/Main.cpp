@@ -261,6 +261,8 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 	// メインループ
 	while (ProcessMessage() != -1 && ClearDrawScreen() != -1 && gpUpdateKey() == 0) {
 		mv.Update();
+		
+
 		//音楽の再生
 		if (CheckSoundMem(Sound2) == 0) {
 			PlaySoundMem(Sound2, DX_PLAYTYPE_LOOP, TRUE);
