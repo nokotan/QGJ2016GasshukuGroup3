@@ -209,7 +209,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 	int Sound1, Sound2, Sound3;
 	Sound1 = LoadSoundMem("‡hQGJ_ƒ^ƒCƒgƒ‹.ogg");
 	Sound2 = LoadSoundMem("‡hQGJ_ƒƒCƒ“.ogg");
-	Sound3 = LoadSoundMem("‡hQGJ_ƒŠƒUƒ‹ƒg");
+	Sound3 = LoadSoundMem("‡hQGJ_ƒŠƒUƒ‹ƒg.ogg");
 
 	// ”wŒi‚Ì“Ç‚İ‚İ
 	int BackImageHandle = LoadGraph("Graphic/”wŒi.jpg");
@@ -403,7 +403,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 				}
 			}
 		}
-		}
+		}*/
 
 		// ”wŒi‚Ì•`‰æ
 		DrawGraph(0, 0, BackImageHandle, FALSE);
