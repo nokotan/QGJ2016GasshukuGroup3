@@ -555,9 +555,9 @@ STATE game() {
 		unsigned Cr;
 		Cr = GetColor(255, 255, 255);
 
-		DrawFormatString(500, 0, Cr, "Death Count %d", player.deathcount1);
-		DrawFormatString(500, 20, Cr, "Stage %d", stagenum);
-		DrawFormatString(500, 40, Cr, "time %dmin %dsec", (180 - timer/60)/60,60- (timer/60));
+		DrawFormatString(490, 0, Cr, "Death Count %d", player.deathcount1);
+		DrawFormatString(490, 20, Cr, "Stage %d", stagenum);
+		DrawFormatString(490, 40, Cr, "time %dmin %dsec", (180 - timer/60)/60,60- (timer/60));
 
 		if (player.x >= 608 && stagenum < 3) {
 			//ƒ}ƒbƒvˆÚ“®
