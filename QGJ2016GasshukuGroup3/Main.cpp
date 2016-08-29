@@ -370,7 +370,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 		}
 		
 		// ƒvƒŒƒCƒ„[•`‰æ
-		for (int i = 0; i < MapTilesWidth; i++) {
+		/*for (int i = 0; i < MapTilesWidth; i++) {
 			for (int j = 0; j < MapTilesHeight; j++) {
 				if (MapTiles[i][j] == 0) {
 					DrawGraph(i * 32, j * 32, jimen, TRUE);
