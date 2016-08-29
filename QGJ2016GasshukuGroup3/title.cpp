@@ -5,7 +5,7 @@ int title() {
 	int title = LoadGraph("タイトル画面.png");
 	int FontHandle;
 	// 作成したデータの識別番号を変数 FontHandle に保存する
-	FontHandle = CreateFontToHandle(NULL, 40, 3);
+	FontHandle = CreateFontToHandle(NULL, 40, 3, DX_FONTTYPE_ANTIALIASING);
 
 
 	while (ProcessMessage() != -1 && ClearDrawScreen() != -1) {
