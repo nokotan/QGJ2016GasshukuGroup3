@@ -169,6 +169,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="Particles.cpp" />
+    <ClCompile Include="Lift.cpp" />
     <ClCompile Include="title.cpp" />
     <ClCompile Include="Input.cpp" />
     <ClCompile Include="Main.cpp" />
@@ -182,6 +183,7 @@
     <ClInclude Include="Collider.h" />
     <ClInclude Include="DebugHelper.h" />
     <ClInclude Include="Input.h" />
+    <ClInclude Include="Lift.h" />
     <ClInclude Include="MapEditor.h" />
     <ClInclude Include="Materials.h" />
     <ClInclude Include="MemberCheck.h" />
