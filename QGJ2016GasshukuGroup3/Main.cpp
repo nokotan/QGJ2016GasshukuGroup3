@@ -1,10 +1,11 @@
 #include "DxLib.h"
 #include "Collider.h"
 #include "MapEditor.h"
+#include "Scenes.h"
 #include <cmath>
 
 struct Player {
-	int x, y, width, height, dx, dy, fly,deathcount1,deathcount2;
+	int x, y, width, height, dx, dy, fly, deathcount1, deathcount2;
 	int FloorDeltaX;
 
 	// ï˚å¸Çï\ÇµÇ‹Ç∑ÅB
@@ -25,7 +26,7 @@ static int ballcount = 0;
 static int bcount = 0;
 
 bool Player::OnCollideFromSide(int& tileid, int, int) {
-	x = 0;	
+	x = 0;
 
 	if (tileid == 1 || tileid == 5) {
 		return true;
@@ -59,10 +60,12 @@ bool Player::OnCollideFromTop(int& tileid, int i, int j) {
 		*(tileobjptr - 1) = 2;
 		*(tileobjptr - 15) = 2;
 		*(tileobjptr + 15) = 2;
-	} else if (tileid == 2) {
+	}
+	else if (tileid == 2) {
 		// éÄñS
 		deathcount2++;
-	} else if (tileid == 5) {
+	}
+	else if (tileid == 5) {
 		return true;
 	}
 
@@ -71,7 +74,7 @@ bool Player::OnCollideFromTop(int& tileid, int i, int j) {
 
 struct Tile {
 	int x, y, dx, dy, width, height;
-	bool flag,flag2;
+	bool flag, flag2;
 };
 const int TILE_MAX = 10;
 Tile ball[TILE_MAX];
@@ -81,7 +84,7 @@ Tile drill[TILE_MAX];
 int stagenum = 1;
 
 //èâä˙âªÇ∑ÇÈä÷êî
-void Initialization(int map,MapViewer &mv) {
+void Initialization(int map, MapViewer &mv) {
 	player.x = 0;
 	player.y = 200;
 	player.width = 32;
@@ -129,7 +132,7 @@ void moveBall(Tile* ball) {
 
 void moveBridge(Tile *b) {
 	for (int i = 0; i < bcount; ++i) {
-		if ((player.x + player.width / 2) >= b[i].x && abs(player.y - b[i].y) < 100 && b[i].flag ) {
+		if ((player.x + player.width / 2) >= b[i].x && abs(player.y - b[i].y) < 100 && b[i].flag) {
 			b[i].dy = 50;
 			b[i].flag = false;
 		}
@@ -226,11 +229,12 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 	drill[1].y = 32 * 13;
 	drill[1].dx = 0;
 	drill[1].dy = 0;
-
+	STATE nextstate = TITLE;
 	// ÉÅÉCÉìÉãÅ[Év
 	while (ProcessMessage() != -1 && ClearDrawScreen() != -1 && gpUpdateKey() == 0) {
+
 		mv.Update();
-		
+
 
 		//âπäyÇÃçƒê∂
 		if (CheckSoundMem(Sound2) == 0) {
@@ -273,7 +277,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 
 		moveBall(ball);
 		moveBridge(bridge);
-		
+
 		//}
 
 		if (MyMap.X < -10 * 32) {
@@ -290,12 +294,12 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 		player.FloorDeltaX = 0;
 		int DefX = player.x, DefY = player.y;
 		int DefDeltaX = player.dx, DefDeltaY = player.dy;
-		CollisionCheck(player, MapTiles, 32, -1);	
+		CollisionCheck(player, MapTiles, 32, -1);
 		int NewX = player.x, NewY = player.y;
 
 		player.x = DefX; player.y = DefY;
 		CollisionCheck(player, MyMap, -1);
-			
+
 		if (DefDeltaX - MyMap.DeltaX > 0) {
 			if (player.x > NewX) {
 				player.x = NewX;
@@ -318,12 +322,12 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 			}
 		}
 
-		
+
 		for (int i = 0; i < TILE_MAX; ++i) {
 			drill[i].x += drill[i].dx;
 			drill[i].y += drill[i].dy;
 		}
-		
+
 		//éÄÇÒÇæÇÁdeathcountÇëùÇ‚Çµédä|ÇØÇ™å≥Ç…ñﬂÇÈÅBplayerÇÕíÜä‘Ç…îÚÇ‘(éÄñSèàóù)
 		if (player.deathcount1 < player.deathcount2) {
 			player.deathcount1 = player.deathcount2;
@@ -349,30 +353,23 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 				}
 			}
 		}
-		
-		// ÉvÉåÉCÉÑÅ[ï`âÊ
-		/* for (int i = 0; i < MapTilesWidth; i++) {
-			for (int j = 0; j < MapTilesHeight; j++) {
-				if (MapTiles[i][j] == 0) {
-					DrawGraph(i * 32, j * 32, jimen, TRUE);
-				}
-				else if (MapTiles[i][j] == 4) {
-					DrawGraph(i * 32, j * 32, hasi, TRUE);
-				}
-				}
-			}
-		} */
+
 
 		// îwåiÇÃï`âÊ
 		DrawGraph(0, 0, BackImageHandle, FALSE);
-
-
-			//óéÇøÇƒÇ≠ÇÈãÖ
+		for (int i = 0; i < MapTilesHeight; ++i) {
+			for (int j = 0; j < MapTilesWidth; ++j) {
+				if (MapTiles[j][i] == 0) {
+					DrawGraph(j * 32, i * 32, jimen, TRUE);
+				}
+			}
+		}
+		//óéÇøÇƒÇ≠ÇÈãÖ
 		for (int i = 0; i < ballcount; ++i) {
 			if (ball[i].flag)
 				DrawGraph(ball[i].x, ball[i].y, ballHandle, TRUE);
 		}
-		
+
 		//óéÇøÇÈã¥
 		for (int i = 0; i < bcount; ++i) {
 			if (bridge[i].flag) {
@@ -396,7 +393,8 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 
 		if (player.FaceDirection == Player::Direction::Direction_Left) {
 			DrawTurnGraph(player.x, player.y, PlayerImageHandles[0], TRUE);
-		} else {
+		}
+		else {
 			DrawGraph(player.x, player.y, PlayerImageHandles[0], TRUE);
 		}
 
@@ -411,46 +409,62 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 
 
 		switch (stagenum) {
-			case 1:
-				for (int i : {0, 1, 2, 6, 7, 8, 11, 12, 15, 16, 17, 18, 19}) {
-					if (jimen != -1) {
-						//ínñ ÇÃï`âÊ
-						DrawGraph(32 * i, 32 * 14, jimen, false);
-					}
+		case 2:
+			//â°Ç…ìÆÇ¢ÇƒÇ≠ÇÈÇ∆Ç∞
+			for (int i = 0; i < 2; ++i) {
+				if (abs(player.x - drill[i].x) < 32 * 2 && (drill[i].y - player.y) < 32 * 2) {
+					drill[i].dx = -10;
 				}
-				for (int i : {9, 10, 13, 14}) {
-					if (hasi != -1) {
-						//ã¥ÇÃï`âÊ
-						DrawGraph(32 * i, 32 * 14, hasi, true);
-					}
-				}
-				break;
-			case 2:
-				for (int i = 0; i < 20; ++i) {
-					if (jimen != -1) {
-						//ínñ ÇÃï`âÊ
-						DrawGraph(32 * i, 32 * 14, jimen, true);
-					}
-				}
-				//â°Ç…ìÆÇ¢ÇƒÇ≠ÇÈÇ∆Ç∞
-				for (int i = 0; i < 2; ++i) {
-					if (abs(player.x - drill[i].x) < 32 * 2 && (drill[i].y - player.y) < 32 * 2) {
-						drill[i].dx = -10;
-					}
-					//â°å¸Ç´Ç∆Ç∞ï`âÊ
-					DrawGraph(drill[i].x, drill[i].y, yokotoge, true);
-				}
-				break;
+				//â°å¸Ç´Ç∆Ç∞ï`âÊ
+				DrawGraph(drill[i].x, drill[i].y, yokotoge, true);
+			}
+			break;
 		}
 		if (player.x >= 608 && stagenum < 2) {
 			//É}ÉbÉvà⁄ìÆ
 			player.x = 0;
 			++stagenum;
 			Initialization(stagenum, mv);
+			mv.SetTileKind(tmp);
+			for (int i = 0; i < MapTilesHeight; ++i) {
+				for (int j = 0; j < MapTilesWidth; ++j) {
+					MapTiles[j][i] = tmp[i][j];
+				}
+			}
+			ballcount = 0, bcount = 0;
+			for (int i = 0; i < MapTilesHeight; ++i) {
+				for (int j = 0; j < MapTilesWidth; ++j) {
+					if (MapTiles[j][i] == 5) {
+						ball[ballcount] = Tile{ j * 32, i * 32, 0, 00, 32, 32,false };
+						++ballcount;
+					}
+					if (MapTiles[j][i] == 3) {
+						bridge[bcount] = Tile{ j * 32, i * 32, 0, 00, 32, 32,true,true };
+						++bcount;
+					}
+				}
+			}
 		}
 		mv.Draw();
-		
+
 		ScreenFlip();
+
+		switch (nextstate)
+		{
+		case EXIT:
+			break;
+		case TITLE:
+			nextstate = title();
+			break;
+		case GAME:
+			nextstate = game();
+			break;
+		case RESULT:
+			nextstate = result();
+			break;
+		default:
+			break;
+		}
 	}
 	DxLib_End();
 	return 0;
