@@ -2,7 +2,7 @@
 #include "DxLib.h"
 
 const int BASISX = 0;
-const int BASISY = 0;
+const int BASISY = -32;
 
 static bool DEBUGMODE = false;
 const int WinWidth = DEBUGMODE ? 880 : 680;
