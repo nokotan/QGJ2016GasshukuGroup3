@@ -6,6 +6,15 @@
 struct Player {
 	int x, y, width, height, dx, dy, fly,deathcount1,deathcount2;
 	int FloorDeltaX;
+
+	// 方向を表します。
+	enum Direction {
+		// 左向き
+		Direction_Left,
+		// 右向き
+		Direction_Right
+	} FaceDirection;
+
 	bool OnCollideFromSide(int& tileid, int, int);
 	bool OnCollideFromBottom(int& tileid, int, int);
 	bool OnCollideFromTop(int& tileid, int, int);
@@ -17,7 +26,7 @@ static int ballcount = 0;
 bool Player::OnCollideFromSide(int& tileid, int, int) {
 	x = 0;	
 
-	if (tileid == 1) {
+	if (tileid == 1 || tileid == 5) {
 		return true;
 	}
 
@@ -28,7 +37,7 @@ bool Player::OnCollideFromSide(int& tileid, int, int) {
 bool Player::OnCollideFromBottom(int& tileid, int, int) {
 	fly = 0;//0のとき飛べる
 
-	if (tileid == 1) {
+	if (tileid == 1 || tileid == 5) {
 		return true;
 	}
 
@@ -40,6 +49,7 @@ bool Player::OnCollideFromBottom(int& tileid, int, int) {
 }
 
 bool Player::OnCollideFromTop(int& tileid, int i, int j) {
+
 	if (tileid == 1) {
 		// ブロックを実体化
 		tileid = 0;
@@ -48,11 +58,13 @@ bool Player::OnCollideFromTop(int& tileid, int i, int j) {
 		*(tileobjptr - 1) = 2;
 		*(tileobjptr - 15) = 2;
 		*(tileobjptr + 15) = 2;
-	}
-	else if (tileid == 2) {
+	} else if (tileid == 2) {
 		// 死亡
 		deathcount2++;
+	} else if (tileid == 5) {
+		return true;
 	}
+
 	return false;
 }
 
@@ -188,6 +200,13 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 	Sound1 = LoadSoundMem("合宿QGJ_タイトル.ogg");
 	Sound2 = LoadSoundMem("合宿QGJ_メイン.ogg");
 	Sound3 = LoadSoundMem("合宿QGJ_リザルト");
+
+	// 背景の読み込み
+	int BackImageHandle = LoadGraph("Graphic/背景.jpg");
+	// プレイヤーの画像の読み込み
+	int PlayerImageHandles[3];
+	LoadDivGraph("Graphic/Character.png", 3, 3, 1, 32, 64, PlayerImageHandles);
+
 	CMap MyMap { 30, 30 };
 	MyMap.Fill(-1);
 
@@ -242,9 +261,11 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 
 		// 入力に応じて、プレイヤーのスピードを変える
 		if (CheckHitKey(KEY_INPUT_LEFT)) {
+			player.FaceDirection = Player::Direction::Direction_Left;
 			player.dx = -2 + player.FloorDeltaX;
 		}
 		else if (CheckHitKey(KEY_INPUT_RIGHT)) {
+			player.FaceDirection = Player::Direction::Direction_Right;
 			player.dx = 2 + player.FloorDeltaX;
 		}
 		else {
@@ -352,6 +373,10 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 				}
 			}
 		}*/
+
+		// 背景の描画
+		DrawGraph(0, 0, BackImageHandle, FALSE);
+
 		for (int i = 0; i < ballcount; ++i) {
 			if(ball[i].flag)
 			DrawBox(ball[i].x, ball[i].y, ball[i].x + ball[i].width, ball[i].y + ball[i].height, GetColor(0, 0, 222), TRUE);
@@ -365,7 +390,13 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 			}
 		}
 
-		DrawBox(player.x, player.y, player.x + player.width, player.y + player.height, GetColor(255, 255, 255), TRUE);
+		// DrawBox(player.x, player.y, player.x + player.width, player.y + player.height, GetColor(255, 255, 255), TRUE);
+		if (player.FaceDirection == Player::Direction::Direction_Left) {
+			DrawTurnGraph(player.x, player.y, PlayerImageHandles[0], TRUE);
+		} else {
+			DrawGraph(player.x, player.y, PlayerImageHandles[0], TRUE);
+		}
+
 
 		// 白色の値を取得
 		unsigned Cr;
