@@ -99,7 +99,7 @@ void Stage(int& x,int& y,Tile* ti,MapViewer &mv) {
 
 	switch(stagenum){
 	case 1:
-		for (int i : {0, 1, 2, 6, 7, 8, 11, 12, 15, 16, 17, 18, 19}) {
+		/*for (int i : {0, 1, 2, 6, 7, 8, 11, 12, 15, 16, 17, 18, 19}) {
 			if (jimen != -1) {
 				//地面の描画
 				DrawGraph(32 * i, 32 * 14, jimen, false);
@@ -110,7 +110,7 @@ void Stage(int& x,int& y,Tile* ti,MapViewer &mv) {
 				//橋の描画
 				DrawGraph(32 * i, 32 * 14, hasi, true);
 		}
-		}
+		}*/
 		break;
 	case 2:
 		for (int i = 0; i < 20; ++i) {
@@ -139,10 +139,10 @@ void Stage(int& x,int& y,Tile* ti,MapViewer &mv) {
 
 //1は敵２は自機、あたり判定
 bool Checkhitchery(int x1, int y1, int width1, int height1, int x2, int y2, int width2, int height2) {
-	if (x1 < (x2 + width2)) {
-		if ((x1 + width1) > x2) {
-			if (y1 < (y2 + height2)) {
-				if ((y1 + height1) > y2) {
+	if (x1 <= (x2 + width2)) {
+		if ((x1 + width1) >= x2) {
+			if (y1 <= (y2 + height2)) {
+				if ((y1 + height1) >= y2) {
 					return true;
 				}
 				return false;
@@ -206,6 +206,10 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 	// プレイヤーの画像の読み込み
 	int PlayerImageHandles[3];
 	LoadDivGraph("Graphic/Character.png", 3, 3, 1, 32, 64, PlayerImageHandles);
+
+	int jimen = LoadGraph("Graphic/Jimen.png");
+	int hasi = LoadGraph("Graphic/Hasi.png");
+	int yokotoge = LoadGraph("Graphic/Yokotoge.png");
 
 	CMap MyMap { 30, 30 };
 	MyMap.Fill(-1);
@@ -366,10 +370,14 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 		}
 		
 		// プレイヤー描画
-		/* for (int i = 0; i < MapTilesWidth; i++) {
+		for (int i = 0; i < MapTilesWidth; i++) {
 			for (int j = 0; j < MapTilesHeight; j++) {
 				if (MapTiles[i][j] == 0) {
-					DrawBox(i * 32, j * 32, i * 32 + 32, j * 32 + 32, GetColor(0, 216, 0), TRUE);
+					DrawGraph(i * 32, j * 32, jimen, TRUE);
+				}
+				else if (MapTiles[i][j] == 4) {
+					DrawGraph(i * 32, j * 32, hasi, TRUE);
+				}
 				}
 			}
 		}*/
