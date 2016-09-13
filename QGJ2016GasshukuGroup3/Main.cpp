@@ -159,7 +159,7 @@ void moveBall(Tile* ball) {
 
 void moveBridge(Tile *b) {
 	for (int i = 0; i < bcount; ++i) {
-		if ((player.x + player.width / 2) >= b[i].x && player.y - b[i].y < 5 ) {
+		if ((player.x + player.width / 2) >= b[i].x && (player.y - b[i].y) < 5 ) {
 			b[i].dy = 50;
 			b[i].flag = false;
 		}
@@ -195,7 +195,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 	int Sound1, Sound2, Sound3;
 	Sound1 = LoadSoundMem("‡hQGJ_ƒ^ƒCƒgƒ‹.ogg");
 	Sound2 = LoadSoundMem("‡hQGJ_ƒƒCƒ“.ogg");
-	Sound3 = LoadSoundMem("‡hQGJ_ƒŠƒUƒ‹ƒg");
+	Sound3 = LoadSoundMem("‡hQGJ_ƒŠƒUƒ‹ƒg.ogg");
 
 	// ”wŒi‚Ì“Ç‚Ýž‚Ý
 	int BackImageHandle = LoadGraph("Graphic/”wŒi.jpg");
@@ -379,6 +379,16 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 		// ”wŒi‚Ì•`‰æ
 		DrawGraph(0, 0, BackImageHandle, FALSE);
 
+		for (int i = 0; i < MapTilesHeight; ++i) {
+			for (int j = 0; j < MapTilesWidth; ++j) {
+				if (MapTiles[j][i] == 0) {
+					DrawGraph(j * 32, i * 32, jimen, TRUE);
+				}
+				else if (MapTiles[j][i] == 4) {
+					DrawGraph(j * 32, i * 32, hasi, TRUE);
+				}
+			}
+		}
 
 		//—Ž‚¿‚Ä‚­‚é‹…
 		for (int i = 0; i < ballcount; ++i) {
