@@ -3,6 +3,7 @@
 #include "MapEditor.h"
 #include "Scenes.h"
 #include <cmath>
+
 int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int){
 	ChangeWindowMode(TRUE);
 	SetMainWindowText("ê_ÇÃñºÇÕ");

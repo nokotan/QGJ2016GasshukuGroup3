@@ -161,6 +161,7 @@ const int MapTilesWidth = 20;
 const int MapTilesHeight = 15;
 int MapTiles[MapTilesWidth][MapTilesHeight];
 vector<vector<int>> tmp(MapTilesHeight, vector<int>(MapTilesWidth, -1));
+
 STATE game() {
 	if (!initflag) {
 		// タイルマップとして使う２次元配列
