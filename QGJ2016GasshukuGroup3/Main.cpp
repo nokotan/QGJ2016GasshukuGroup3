@@ -4,11 +4,10 @@
 #include "Scenes.h"
 #include <cmath>
 int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int){
+	ChangeWindowMode(TRUE);
 	SetMainWindowText("神の名は");
-	// タイルマップとして使う２次元配列;
 	DxLib_Init(), SetDrawScreen(DX_SCREEN_BACK);
-	SetBackgroundColor(255, 255, 255);
-	STATE nextstate = ;
+	STATE nextstate = GAME;
 	// メインループ
 	while (true) {
 		if (ProcessMessage() == -1 || ClearDrawScreen() == -1 || gpUpdateKey() != 0) {

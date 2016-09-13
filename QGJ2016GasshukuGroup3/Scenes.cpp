@@ -191,7 +191,7 @@ STATE game() {
 		hasi = LoadGraph("Graphic/Hasi.png");
 		yokotoge = LoadGraph("Graphic/Yokotoge.png");
 		ballHandle = LoadGraph("Graphic/ball.png");
-		//MyMap = CMap{ 30, 30 };
+		MyMap.Create(30, 30);
 		MyMap.Fill(-1);
 
 		for (int i : { 10, 11, 12, 13, 14, 15 }) {
