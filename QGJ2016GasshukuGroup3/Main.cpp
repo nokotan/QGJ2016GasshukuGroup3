@@ -420,7 +420,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 			}
 			break;
 		}
-		if (player.x >= 608 && stagenum < 2) {
+		if (player.x >= 608 && stagenum < 3){
 			//ƒ}ƒbƒvˆÚ“®
 			player.x = 0;
 			++stagenum;
