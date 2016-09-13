@@ -180,7 +180,7 @@ void moveBridge(Tile *b) {
 }
 bool gameflag = false;
 int Sound1, Sound2, Sound3;
-int BackImageHandle, jimen, yokotoge, hasi, ballHandle;
+int BackImageHandle, jimen,toge[4], hasi, ballHandle;
 int timer;
 int PlayerImageHandles[3];
 CMap MyMap;
