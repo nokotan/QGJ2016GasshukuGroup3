@@ -86,6 +86,8 @@ void MapViewer::SetData(int number){
 	string str;
 	stringstream ss;
 	ifstream ifs;
+	const string PATH = "Data/Map/SaveData";
+	filePath = PATH + itos(number) + ".csv";
 	ifs.open(filePath);
 	fail = ifs.fail();
 	getline(ifs.seekg(0, ios_base::cur), str, ',');

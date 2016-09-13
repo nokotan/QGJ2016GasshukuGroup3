@@ -26,7 +26,7 @@ static int ballcount = 0;
 static int bcount = 0;
 
 bool Player::OnCollideFromSide(int& tileid, int, int) {
-	x = 0;	
+	x = 0;
 
 	if (tileid == 1 || tileid == 5) {
 		return true;
@@ -234,6 +234,8 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 	while (ProcessMessage() != -1 && ClearDrawScreen() != -1 && gpUpdateKey() == 0) {
 
 		mv.Update();
+
+
 		//âπäyÇÃçƒê∂
 		if (CheckSoundMem(Sound2) == 0) {
 			PlaySoundMem(Sound2, DX_PLAYTYPE_LOOP, TRUE);
@@ -352,81 +354,100 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 			}
 		}
 
+
+		// îwåiÇÃï`âÊ
+		DrawGraph(0, 0, BackImageHandle, FALSE);
 		for (int i = 0; i < MapTilesHeight; ++i) {
 			for (int j = 0; j < MapTilesWidth; ++j) {
 				if (MapTiles[j][i] == 0) {
 					DrawGraph(j * 32, i * 32, jimen, TRUE);
 				}
-		} */
-
-				// îwåiÇÃï`âÊ
-			DrawGraph(0, 0, BackImageHandle, FALSE);
-
-
-			//óéÇøÇƒÇ≠ÇÈãÖ
-			for (int i = 0; i < ballcount; ++i) {
-				if (ball[i].flag)
-					DrawGraph(ball[i].x, ball[i].y, ballHandle, TRUE);
 			}
-		
-			//óéÇøÇÈã¥
-			for (int i = 0; i < bcount; ++i) {
-				if (bridge[i].flag) {
-					DrawGraph(bridge[i].x, bridge[i].y, hasi, TRUE);
-				}
-				else if (bridge[i].flag2) {
-					int X = bridge[i].x / 32, Y = bridge[i].y / 32;
-					MapTiles[X][Y] = -1;
-					bridge[i].flag2 = false;
-				}
-			}
+		}
+		//óéÇøÇƒÇ≠ÇÈãÖ
+		for (int i = 0; i < ballcount; ++i) {
+			if (ball[i].flag)
+				DrawGraph(ball[i].x, ball[i].y, ballHandle, TRUE);
+		}
 
-			for (int i = 0; i < MyMap.Cols(); i++) {
-				for (int j = 0; j < MyMap.Rows(); j++) {
-					if (MyMap[i][j] != -1 && MyMap[i][j] != 1) {
+		//óéÇøÇÈã¥
+		for (int i = 0; i < bcount; ++i) {
+			if (bridge[i].flag) {
+				DrawGraph(bridge[i].x, bridge[i].y, hasi, TRUE);
+			}
+			else if (bridge[i].flag2) {
+				int X = bridge[i].x / 32, Y = bridge[i].y / 32;
+				MapTiles[X][Y] = -1;
+				bridge[i].flag2 = false;
+			}
+		}
+
+		for (int i = 0; i < MyMap.Cols(); i++) {
+			for (int j = 0; j < MyMap.Rows(); j++) {
+				if (MyMap[i][j] != -1 && MyMap[i][j] != 1) {
 					DrawGraph(MyMap.X + i * 32, MyMap.Y + j * 32, jimen, TRUE);
 					// DrawBox(MyMap.X + i * 32, MyMap.Y + j * 32, MyMap.X + i * 32 + 32, MyMap.Y + j * 32 + 32, GetColor(0, 216, 0), TRUE);
+				}
+			}
+		}
+
+		if (player.FaceDirection == Player::Direction::Direction_Left) {
+			DrawTurnGraph(player.x, player.y, PlayerImageHandles[0], TRUE);
+		}
+		else {
+			DrawGraph(player.x, player.y, PlayerImageHandles[0], TRUE);
+		}
+
+
+		// îíêFÇÃílÇéÊìæ
+		unsigned Cr;
+		Cr = GetColor(255, 255, 255);
+
+		DrawFormatString(500, 0, Cr, "Death Count %d", player.deathcount1);
+		DrawFormatString(500, 20, Cr, "Stage %d", stagenum);
+
+
+
+		switch (stagenum) {
+		case 2:
+			//â°Ç…ìÆÇ¢ÇƒÇ≠ÇÈÇ∆Ç∞
+			for (int i = 0; i < 2; ++i) {
+				if (abs(player.x - drill[i].x) < 32 * 2 && (drill[i].y - player.y) < 32 * 2) {
+					drill[i].dx = -10;
+				}
+				//â°å¸Ç´Ç∆Ç∞ï`âÊ
+				DrawGraph(drill[i].x, drill[i].y, yokotoge, true);
+			}
+			break;
+		}
+		if (player.x >= 608 && stagenum < 2) {
+			//É}ÉbÉvà⁄ìÆ
+			player.x = 0;
+			++stagenum;
+			Initialization(stagenum, mv);
+			mv.SetTileKind(tmp);
+			for (int i = 0; i < MapTilesHeight; ++i) {
+				for (int j = 0; j < MapTilesWidth; ++j) {
+					MapTiles[j][i] = tmp[i][j];
+				}
+			}
+			ballcount = 0, bcount = 0;
+			for (int i = 0; i < MapTilesHeight; ++i) {
+				for (int j = 0; j < MapTilesWidth; ++j) {
+					if (MapTiles[j][i] == 5) {
+						ball[ballcount] = Tile{ j * 32, i * 32, 0, 00, 32, 32,false };
+						++ballcount;
+					}
+					if (MapTiles[j][i] == 3) {
+						bridge[bcount] = Tile{ j * 32, i * 32, 0, 00, 32, 32,true,true };
+						++bcount;
 					}
 				}
 			}
+		}
+		mv.Draw();
 
-			if (player.FaceDirection == Player::Direction::Direction_Left) {
-				DrawTurnGraph(player.x, player.y, PlayerImageHandles[0], TRUE);
-		} else {
-				DrawGraph(player.x, player.y, PlayerImageHandles[0], TRUE);
-			}
-
-
-			// îíêFÇÃílÇéÊìæ
-			unsigned Cr;
-			Cr = GetColor(255, 255, 255);
-
-			DrawFormatString(500, 0, Cr, "Death Count %d", player.deathcount1);
-			DrawFormatString(500, 20, Cr, "Stage %d", stagenum);
-
-
-
-			switch (stagenum) {
-			case 2:
-				//â°Ç…ìÆÇ¢ÇƒÇ≠ÇÈÇ∆Ç∞
-				for (int i = 0; i < 2; ++i) {
-					if (abs(player.x - drill[i].x) < 32 * 2 && (drill[i].y - player.y) < 32 * 2) {
-						drill[i].dx = -10;
-					}
-					//â°å¸Ç´Ç∆Ç∞ï`âÊ
-					DrawGraph(drill[i].x, drill[i].y, yokotoge, true);
-				}
-				break;
-			}
-			if (player.x >= 608 && stagenum < 2) {
-				//É}ÉbÉvà⁄ìÆ
-				player.x = 0;
-				++stagenum;
-				Initialization(stagenum, mv);
-			}
-			mv.Draw();
-
-			ScreenFlip();
+		ScreenFlip();
 
 		switch (nextstate)
 		{
@@ -444,7 +465,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 		default:
 			break;
 		}
-		}
-		DxLib_End();
-		return 0;
 	}
+	DxLib_End();
+	return 0;
+}
