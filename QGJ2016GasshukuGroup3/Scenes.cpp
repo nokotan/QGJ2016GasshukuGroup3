@@ -53,9 +53,6 @@ struct Player {
 };
 
 Player player;
-static int ballcount = 0;
-static int bcount = 0;
-static int drillcount = 0;
 
 bool Player::OnCollideFromSide(int& tileid, int, int) {
 	x = 0;
@@ -107,34 +104,26 @@ bool Player::OnCollideFromTop(int& tileid, int i, int j) {
 struct Tile {
 	int x, y, dx, dy, width, height;
 	bool flag, flag2;
+	int dir;
 };
-const int TILE_MAX = 10;
+const int TILE_MAX = 20;
 Tile ball[TILE_MAX];
 Tile bridge[TILE_MAX];
 Tile drill[TILE_MAX];
+Tile invis[TILE_MAX];
 
 int stagenum = 1;
 
-//初期化する関数
-void Initialization(int map, MapViewer &mv) {
-	player.x = 0;
-	player.y = 200;
-	player.width = 32;
-	player.height = 64;
-	player.dx = 0;
-	player.dy = 0;
-
-	player.fly = 0;
-	ballcount = 0;
-	mv.SetData(map);
-}
-
+static int ballcount = 0;
+static int bcount = 0;
+static int drillcount = 0;
+static int inviscount = 0;
 
 //1は敵２は自機、あたり判定
 bool Checkhitchery(int x1, int y1, int width1, int height1, int x2, int y2, int width2, int height2) {
 	if (x1 <= (x2 + width2)) {
 		if ((x1 + width1) >= x2) {
-			if (y1 <= (y2 + height2)) {
+			if (y1 <= (y2 + height2) ) {
 				if ((y1 + height1) >= y2) {
 					return true;
 				}
@@ -161,8 +150,40 @@ void moveBall(Tile* ball) {
 		}
 	}
 }
+const int dx[] = { 0,1,0,-1 };
+const int dy[] = { 1,0,-1,0 };
+const int MapTilesWidth = 20;
+const int MapTilesHeight = 15;
+const int drillsuf = 9;
+int MapTiles[MapTilesWidth][MapTilesHeight];
 
-void drillAttack(Tile* drill) {
+bool IsDrillHit(Player p, Tile t) {
+	int dir = t.dir;
+	if (dir == 0 || dir == 2) {
+		if (t.x -1<= p.x + p.width ) {
+			return true;
+		}
+	}
+	else if ((dir == 1 || dir == 3)&& p.y <= t.y + t.height) {
+		return true;
+	}
+	return false;
+}
+
+void drillAttack(Tile* drill ) {
+	for (int i = 0; i < drillcount; ++i) {
+		int dir = drill[i].dir;
+		if ( drill[i].flag &&  IsDrillHit(player,drill[i])) {
+			MapTiles[drill[i].x / 32][drill[i].y / 32] = -1;
+			drill[i].dx = -10 * dx[dir];
+			drill[i].dy = -10 * dy[dir];
+			drill[i].flag = false;
+		}
+	}
+	for (int i = 0; i < drillcount; ++i) {
+		drill[i].x += drill[i].dx;
+		drill[i].y += drill[i].dy;
+	}
 	for (int i = 0; i < drillcount; ++i) {
 		if (Checkhitchery(drill[i].x, drill[i].y, drill[i].width, drill[i].height, player.x, player.y, player.width, player.height)) {
 			player.deathcount2++;
@@ -170,9 +191,19 @@ void drillAttack(Tile* drill) {
 	}
 }
 
+void invisManifestation(Tile* t) {
+	for (int i = 0; i < inviscount; ++i) {
+		if (t[i].x <= player.x && player.x + player.width <= t[i].x + t[i].width) {
+			if (player.y - t[i].y >= 0 && player.y - t[i].y <= 68) {
+				t[i].flag = true;
+			}
+		}
+	}
+}
+
 void moveBridge(Tile *b) {
 	for (int i = 0; i < bcount; ++i) {
-		if ((player.x + player.width / 2) >= b[i].x && abs(player.y - b[i].y) < 100 && b[i].flag) {
+		if (b[i].flag2 && (player.x + player.width / 2) >= b[i].x && abs(player.y - b[i].y) < 100 && b[i].flag) {
 			b[i].dy = 50;
 			b[i].flag = false;
 		}
@@ -180,16 +211,26 @@ void moveBridge(Tile *b) {
 }
 bool gameflag = false;
 int Sound1, Sound2, Sound3;
-int BackImageHandle, jimen, yokotoge, hasi, ballHandle;
+int BackImageHandle, jimen,toge[4], hasi, ballHandle;
 int timer;
 int PlayerImageHandles[3];
 CMap MyMap;
 MapViewer mv;
-const int MapTilesWidth = 20;
-const int MapTilesHeight = 15;
-int MapTiles[MapTilesWidth][MapTilesHeight];
 vector<vector<int>> tmp(MapTilesHeight, vector<int>(MapTilesWidth, -1));
+Particle particle;
+//初期化する関数
+void Initialization(int map, MapViewer &mv) {
+	player.x = 0;
+	player.y = 200;
+	player.width = 32;
+	player.height = 64;
+	player.dx = 0;
+	player.dy = 0;
 
+	player.fly = 0;
+	ballcount = 0;
+	mv.SetData(map);
+}
 STATE game() {
 	if (!gameflag) {
 		// タイルマップとして使う２次元配列
@@ -221,7 +262,9 @@ STATE game() {
 
 		jimen = LoadGraph("Graphic/Jimen.png");
 		hasi = LoadGraph("Graphic/Hasi.png");
-		yokotoge = LoadGraph("Graphic/Yokotoge.png");
+		for (int i = 0; i < 4; ++i) {
+			toge[i] = LoadGraph((string("Graphic/toge") + to_string(i)+ ".png").c_str());
+		}
 		ballHandle = LoadGraph("Graphic/ball.png");
 		MyMap.Create(30, 30);
 		MyMap.Fill(-1);
@@ -248,37 +291,39 @@ STATE game() {
 		//Bridgeのセット（落ちる方）
 		for (int i = 0; i < MapTilesHeight; ++i) {
 			for (int j = 0; j < MapTilesWidth; ++j) {
-				if (MapTiles[j][i] == 5) {
-					ball[ballcount] = Tile{ j * 32, i * 32, 0, 00, 32, 32,false };
+				if (MapTiles[j][i] == 1) {
+					bridge[bcount] = Tile{ j * 32, i * 32, 0, 0, 32, 32,true,true };
+					++bcount;
+				}
+				else if (MapTiles[j][i] == 2) {
+					bridge[bcount] = Tile{ j * 32, i * 32, 0, 0, 32, 32,true,false };
+					++bcount;
+				}
+				else if (MapTiles[j][i] == 3) {
+					ball[ballcount] = Tile{ j * 32, i * 32, 0, 0, 32, 32,false };
 					++ballcount;
 				}
-				if (MapTiles[j][i] == 3) {
-					bridge[bcount] = Tile{ j * 32, i * 32, 0, 00, 32, 32,true,true };
-					++bcount;
+				else if (MapTiles[j][i] == 4) {
+					invis[inviscount] = Tile{ j * 32,i * 32,0,0,32,36,false };
+					++inviscount;
+				}
+				else if (drillsuf - 4 <= MapTiles[j][i] && MapTiles[j][i] < drillsuf) {
+					drill[drillcount] = Tile{ j * 32, i * 32, 0, 0, 32, 32,false,true, MapTiles[j][i] - (drillsuf - 4) };
+					++drillcount;
+				}
+				else if (MapTiles[j][i] >= drillsuf) {//動くトゲ
+					drill[drillcount] = Tile{ j * 32, i * 32, 0, 0, 32, 32,true,true, MapTiles[j][i] - drillsuf };
+					++drillcount;
 				}
 			}
 		}
-
-
-		drillcount = 2;
-		for (int i = 0; i < TILE_MAX; ++i) {
-			drill[i].height = 32;
-			drill[i].width = 32;
-		}
-		drill[0].x = 32 * 3;
-		drill[0].y = 32 * 12;
-		drill[0].dx = 0;
-		drill[0].dy = 0;
-		drill[1].x = 32 * 3;
-		drill[1].y = 32 * 13;
-		drill[1].dx = 0;
-		drill[1].dy = 0;
 		STATE nextstate = TITLE;
 		gameflag = true;
 	}
 	else{
 		// メインループ
 		mv.Update();
+		particle.UpdateParticles();
 
 
 		//音楽の再生
@@ -322,6 +367,8 @@ STATE game() {
 
 		moveBall(ball);
 		moveBridge(bridge);
+		drillAttack(drill);
+		invisManifestation(invis);
 
 		//}
 
@@ -368,14 +415,14 @@ STATE game() {
 		}
 
 
-		for (int i = 0; i < TILE_MAX; ++i) {
-			drill[i].x += drill[i].dx;
-			drill[i].y += drill[i].dy;
-		}
 
 		//死んだらdeathcountを増やし仕掛けが元に戻る。playerは中間に飛ぶ(死亡処理)
 		if (player.deathcount1 < player.deathcount2) {
 			player.deathcount1 = player.deathcount2;
+			for (int i = 0; i < 30; ++i) {
+				auto p = (new Particle(player.x,player.y));
+				particle.Factory(p);
+			}
 			Initialization(stagenum, mv);
 			mv.SetTileKind(tmp);
 			for (int i = 0; i < MapTilesHeight; ++i) {
@@ -385,15 +432,33 @@ STATE game() {
 			}
 			ballcount = 0;
 			bcount = 0;
+			drillcount = 0;
+			inviscount = 0;
 			for (int i = 0; i < MapTilesHeight; ++i) {
 				for (int j = 0; j < MapTilesWidth; ++j) {
-					if (MapTiles[j][i] == 5) {
-						ball[ballcount] = Tile{ j * 32, i * 32, 0, 00, 32, 32,false };
+					if (MapTiles[j][i] == 1) {
+						bridge[bcount] = Tile{ j * 32, i * 32, 0, 0, 32, 32,true,true };
+						++bcount;
+					}
+					else if (MapTiles[j][i] == 2) {
+						bridge[bcount] = Tile{ j * 32, i * 32, 0, 0, 32, 32,true,false };
+						++bcount;
+					}
+					else if (MapTiles[j][i] == 3) {
+						ball[ballcount] = Tile{ j * 32, i * 32, 0, 0, 32, 32,false };
 						++ballcount;
 					}
-					if (MapTiles[j][i] == 3) {
-						bridge[bcount] = Tile{ j * 32, i * 32, 0, 00, 32, 32,true,true };
-						++bcount;
+					else if (MapTiles[j][i] == 4) {
+						invis[inviscount] = Tile{ j * 32,i * 32,0,0,32,36,false };
+						++inviscount;
+					}
+					else if (drillsuf - 4 <= MapTiles[j][i] && MapTiles[j][i] < drillsuf) {
+						drill[drillcount] = Tile{ j * 32, i * 32, 0, 0, 32, 32,false,true, MapTiles[j][i] - (drillsuf - 4) };
+						++drillcount;
+					}
+					else if (MapTiles[j][i] >= drillsuf) {//動くトゲ
+						drill[drillcount] = Tile{ j * 32, i * 32, 0, 0, 32, 32,true,true, MapTiles[j][i] - drillsuf };
+						++drillcount;
 					}
 				}
 			}
@@ -426,6 +491,14 @@ STATE game() {
 				bridge[i].flag2 = false;
 			}
 		}
+		for (int i = 0; i < drillcount; ++i) {
+			DrawGraph(drill[i].x, drill[i].y, toge[drill[i].dir], TRUE);
+			DrawFormatString(drill[i].x, drill[i].y, blue, "%d", drill[i].dir);
+		}
+		for (int i = 0; i < inviscount; ++i) {
+			if(invis[i].flag)
+				DrawGraph(invis[i].x, invis[i].y, jimen, TRUE);
+		}
 
 		for (int i = 0; i < MyMap.Cols(); i++) {
 			for (int j = 0; j < MyMap.Rows(); j++) {
@@ -452,20 +525,6 @@ STATE game() {
 		DrawFormatString(500, 20, Cr, "Stage %d", stagenum);
 		DrawFormatString(500, 40, Cr, "time %dmin %dsec", (180 - timer/60)/60,60- (timer/60));
 
-
-
-		switch (stagenum) {
-		case 2:
-			//横に動いてくるとげ
-			for (int i = 0; i < 2; ++i) {
-				if (abs(player.x - drill[i].x) < 32 * 2 && (drill[i].y - player.y) < 32 * 2) {
-					drill[i].dx = -10;
-				}
-				//横向きとげ描画
-				DrawGraph(drill[i].x, drill[i].y, yokotoge, true);
-			}
-			break;
-		}
 		if (player.x >= 608 && stagenum < 3) {
 			//マップ移動
 			player.x = 0;
@@ -477,16 +536,34 @@ STATE game() {
 					MapTiles[j][i] = tmp[i][j];
 				}
 			}
-			ballcount = 0, bcount = 0;
+			ballcount = 0;
+			bcount = 0;
+			drillcount = 0;
 			for (int i = 0; i < MapTilesHeight; ++i) {
 				for (int j = 0; j < MapTilesWidth; ++j) {
-					if (MapTiles[j][i] == 5) {
-						ball[ballcount] = Tile{ j * 32, i * 32, 0, 00, 32, 32,false };
+					if (MapTiles[j][i] == 1) {
+						bridge[bcount] = Tile{ j * 32, i * 32, 0, 0, 32, 32,true,true };
+						++bcount;
+					}
+					else if (MapTiles[j][i] == 2) {
+						bridge[bcount] = Tile{ j * 32, i * 32, 0, 0, 32, 32,true,false };
+						++bcount;
+					}
+					else if (MapTiles[j][i] == 3) {
+						ball[ballcount] = Tile{ j * 32, i * 32, 0, 0, 32, 32,false };
 						++ballcount;
 					}
-					if (MapTiles[j][i] == 3) {
-						bridge[bcount] = Tile{ j * 32, i * 32, 0, 00, 32, 32,true,true };
-						++bcount;
+					else if (MapTiles[j][i] == 4) {
+						invis[inviscount] = Tile{ j * 32,i * 32,0,0,32,32,false };
+						++inviscount;
+					}
+					else if (drillsuf - 4 <= MapTiles[j][i] && MapTiles[j][i] < drillsuf) {
+						drill[drillcount] = Tile{ j * 32, i * 32, 0, 0, 32, 32,false,true, MapTiles[j][i] - (drillsuf - 4) };
+						++drillcount;
+					}
+					else if (MapTiles[j][i] >= drillsuf) {//動くトゲ
+						drill[drillcount] = Tile{ j * 32, i * 32, 0, 0, 32, 32,true,true, MapTiles[j][i] - drillsuf };
+						++drillcount;
 					}
 				}
 			}
@@ -502,9 +579,10 @@ STATE game() {
 			return GAMEOVER;
 		}
 		mv.Draw();
+		particle.DrawParticles();
 	}
-	return GAME;
-}
+		return GAME;
+	}
 
 
 bool resultflag = false;
