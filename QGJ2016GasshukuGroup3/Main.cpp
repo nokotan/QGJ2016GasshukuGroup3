@@ -22,6 +22,7 @@ struct Player {
 
 Player player;
 static int ballcount = 0;
+static int bcount = 0;
 
 bool Player::OnCollideFromSide(int& tileid, int, int) {
 	x = 0;	
@@ -70,10 +71,11 @@ bool Player::OnCollideFromTop(int& tileid, int i, int j) {
 
 struct Tile {
 	int x, y, dx, dy, width, height;
-	bool flag;
+	bool flag,flag2;
 };
 const int TILE_MAX = 10;
 Tile ball[TILE_MAX];
+Tile bridge[TILE_MAX];
 Tile drill[TILE_MAX];
 
 int stagenum = 1;
@@ -131,6 +133,16 @@ void moveBall(Tile* ball) {
 	}
 }
 
+void moveBridge(Tile *b) {
+	for (int i = 0; i < bcount; ++i) {
+		if ((player.x + player.width / 2) >= b[i].x && player.y - b[i].y < 5 ) {
+			b[i].dy = 50;
+			b[i].flag = false;
+		}
+		b[i].y += b[i].dy;
+	}
+}
+
 
 int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 	ChangeWindowMode(TRUE);
@@ -155,8 +167,6 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 		}
 	}
 
-	//Halksel
-
 	//音楽のための変数と読み込み
 	int Sound1, Sound2, Sound3;
 	Sound1 = LoadSoundMem("合宿QGJ_タイトル.ogg");
@@ -172,7 +182,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 	int jimen = LoadGraph("Graphic/Jimen.png");
 	int hasi = LoadGraph("Graphic/Hasi.png");
 	int yokotoge = LoadGraph("Graphic/Yokotoge.png");
-
+	int ballHandle = LoadGraph("Graphic/ball.png");
 	CMap MyMap { 30, 30 };
 	MyMap.Fill(-1);
 
@@ -195,14 +205,21 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 		}
 	}
 	//Ballのセット
+	//Bridgeのセット（落ちる方）
 	for (int i = 0; i < MapTilesHeight; ++i) {
 		for (int j = 0; j < MapTilesWidth; ++j) {
 			if (MapTiles[j][i] == 5) {
 				ball[ballcount] = Tile{ j * 32, i * 32, 0, 00, 32, 32,false };
 				++ballcount;
 			}
+			if (MapTiles[j][i] == 3) {
+				bridge[bcount] = Tile{ j * 32, i * 32, 0, 00, 32, 32,true,true };
+				++bcount;
+			}
 		}
 	}
+
+
 
 	for (int i = 0; i < TILE_MAX; ++i) {
 		drill[i].height = 32;
@@ -249,8 +266,6 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 			player.dy = 10;
 		}
 
-		// mv.Draw();
-
 		//落下死を加える
 		if (player.y > 480) {
 			player.x = 0;
@@ -262,6 +277,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 		//if () {//mapによって変更をする
 
 		moveBall(ball);
+		moveBridge(bridge);
 		
 		//}
 
@@ -313,7 +329,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 		//死んだらdeathcountを増やし仕掛けが元に戻る。playerは中間に飛ぶ(死亡処理)
 		if (player.deathcount1 < player.deathcount2) {
 			player.deathcount1 = player.deathcount2;
-			Initialization(stagenum,mv);
+			Initialization(stagenum, mv);
 			mv.SetTileKind(tmp);
 			for (int i = 0; i < MapTilesHeight; ++i) {
 				for (int j = 0; j < MapTilesWidth; ++j) {
@@ -321,12 +337,16 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 				}
 			}
 			ballcount = 0;
+			bcount = 0;
 			for (int i = 0; i < MapTilesHeight; ++i) {
 				for (int j = 0; j < MapTilesWidth; ++j) {
 					if (MapTiles[j][i] == 5) {
 						ball[ballcount] = Tile{ j * 32, i * 32, 0, 00, 32, 32,false };
 						++ballcount;
 					}
+					if (MapTiles[j][i] == 3) {
+						bridge[bcount] = Tile{ j * 32, i * 32, 0, 00, 32, 32,true,true };
+						++bcount;
 				}
 			}
 		}
@@ -347,9 +367,22 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 		// 背景の描画
 		DrawGraph(0, 0, BackImageHandle, FALSE);
 
+
+		//落ちてくる球
 		for (int i = 0; i < ballcount; ++i) {
 			if(ball[i].flag)
-			DrawBox(ball[i].x, ball[i].y, ball[i].x + ball[i].width, ball[i].y + ball[i].height, GetColor(0, 0, 222), TRUE);
+			DrawGraph(ball[i].x, ball[i].y, ballHandle, TRUE);
+		}
+		//落ちる橋
+		for (int i = 0; i < bcount; ++i) {
+			if (bridge[i].flag) {
+				DrawGraph(bridge[i].x, bridge[i].y, hasi, TRUE);
+			}
+			else if(bridge[i].flag2){
+				int X = bridge[i].x / 32, Y = bridge[i].y / 32;
+				MapTiles[X][Y] = -1;
+				bridge[i].flag2 = false;
+			}
 		}
 
 		for (int i = 0; i < MyMap.Cols(); i++) {
@@ -360,7 +393,6 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 			}
 		}
 
-		// DrawBox(player.x, player.y, player.x + player.width, player.y + player.height, GetColor(255, 255, 255), TRUE);
 		if (player.FaceDirection == Player::Direction::Direction_Left) {
 			DrawTurnGraph(player.x, player.y, PlayerImageHandles[0], TRUE);
 		} else {
@@ -373,6 +405,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 		Cr = GetColor(255, 255, 255);
 
 		DrawFormatString(500, 0,Cr, "Death Count %d",player.deathcount1);
+		DrawFormatString(500, 20,Cr, "Stage %d",stagenum);
 
 		Stage(player.x, player.y, drill,mv);
 
