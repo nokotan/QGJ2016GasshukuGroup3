@@ -100,20 +100,6 @@ void Stage(int& x,int& y,Tile* ti,MapViewer &mv) {
 	int yokotoge = LoadGraph("Graphic/Yokotoge.png");
 
 	switch(stagenum){
-	case 1:
-		/*for (int i : {0, 1, 2, 6, 7, 8, 11, 12, 15, 16, 17, 18, 19}) {
-			if (jimen != -1) {
-				//’n–Ê‚Ì•`‰æ
-				DrawGraph(32 * i, 32 * 14, jimen, false);
-		}
-		}
-		for (int i : {9, 10, 13, 14}) {
-			if (hasi != -1) {
-				//‹´‚Ì•`‰æ
-				DrawGraph(32 * i, 32 * 14, hasi, true);
-		}
-		}*/
-		break;
 	case 2:
 		for (int i = 0; i < 20; ++i) {
 			if (jimen != -1) {
@@ -304,8 +290,6 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 			player.dy = 10;
 		}
 
-		// mv.Draw();
-
 		//—‰º€‚ğ‰Á‚¦‚é
 		if (player.y > 480) {
 			player.x = 0;
@@ -369,7 +353,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 		//€‚ñ‚¾‚çdeathcount‚ğ‘‚â‚µdŠ|‚¯‚ªŒ³‚É–ß‚éBplayer‚Í’†ŠÔ‚É”ò‚Ô(€–Sˆ—)
 		if (player.deathcount1 < player.deathcount2) {
 			player.deathcount1 = player.deathcount2;
-			Initialization(stagenum,mv);
+			Initialization(stagenum, mv);
 			mv.SetTileKind(tmp);
 			for (int i = 0; i < MapTilesHeight; ++i) {
 				for (int j = 0; j < MapTilesWidth; ++j) {
@@ -387,26 +371,14 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 					if (MapTiles[j][i] == 3) {
 						bridge[bcount] = Tile{ j * 32, i * 32, 0, 00, 32, 32,true,true };
 						++bcount;
+					}
 				}
 			}
-		}
 		}
 		
-		// ƒvƒŒƒCƒ„[•`‰æ
-		for (int i = 0; i < MapTilesWidth; i++) {
-			for (int j = 0; j < MapTilesHeight; j++) {
-				if (MapTiles[i][j] == 0) {
-					DrawGraph(i * 32, j * 32, jimen, TRUE);
-				}
-				else if (MapTiles[i][j] == 4) {
-					DrawGraph(i * 32, j * 32, hasi, TRUE);
-				}
-			}
-		}
-		}
-
 		// ”wŒi‚Ì•`‰æ
 		DrawGraph(0, 0, BackImageHandle, FALSE);
+
 
 		//—‚¿‚Ä‚­‚é‹…
 		for (int i = 0; i < ballcount; ++i) {
@@ -433,7 +405,6 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 			}
 		}
 
-		// DrawBox(player.x, player.y, player.x + player.width, player.y + player.height, GetColor(255, 255, 255), TRUE);
 		if (player.FaceDirection == Player::Direction::Direction_Left) {
 			DrawTurnGraph(player.x, player.y, PlayerImageHandles[0], TRUE);
 		} else {
