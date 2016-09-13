@@ -4,12 +4,22 @@
 #include "Scenes.h"
 #include <cmath>
 
+int Sound1, Sound2, Sound3;
+
+
 bool titleflag = false;
 int titleHandle;
 int FontHandle;
 STATE title() {
 	if (!titleflag) {
 		titleHandle = LoadGraph("Graphic/タイトル画面.png");
+
+		//音楽のための変数と読み込み
+		Sound1 = LoadSoundMem("音楽/合宿QGJ_タイトル.ogg");
+		Sound2 = LoadSoundMem("音楽/合宿QGJ_メイン.ogg");
+		Sound3 = LoadSoundMem("音楽/合宿QGJ_リザルト.ogg");
+
+		PlaySoundMem(Sound1, DX_PLAYTYPE_LOOP);
 
 		// 作成したデータの識別番号を変数 FontHandle に保存する
 		FontHandle = CreateFontToHandle(NULL, 40, 3, DX_FONTTYPE_ANTIALIASING);
@@ -20,6 +30,7 @@ STATE title() {
 		if (getKeyPress(KEY_INPUT_SPACE,PRESS_ONCE)) {
 			// 作成したフォントデータを削除する
 			DeleteFontToHandle(FontHandle);
+			StopSoundMem(Sound1);
 			return GAME;
 		}
 
@@ -44,8 +55,10 @@ struct Player {
 		// 左向き
 		Direction_Left = 1,
 		// 右向き
-		Direction_Right = 0
+		Direction_Right = 2,
 	} FaceDirection;
+	int AnimationFlame;
+	int CollidedDirection;
 
 	bool OnCollideFromSide(int& tileid, int, int);
 	bool OnCollideFromBottom(int& tileid, int, int);
@@ -179,7 +192,6 @@ void moveBridge(Tile *b) {
 	}
 }
 bool initflag = false;
-int Sound1, Sound2, Sound3;
 int BackImageHandle, jimen, yokotoge, hasi, ballHandle;
 int PlayerImageHandles[3];
 CMap MyMap;
@@ -285,13 +297,16 @@ STATE game() {
 		// 入力に応じて、プレイヤーのスピードを変える
 		if (CheckHitKey(KEY_INPUT_LEFT)) {
 			player.FaceDirection = Player::Direction::Direction_Left;
+			player.AnimationFlame++;
 			player.dx = -2 + player.FloorDeltaX;
 		}
 		else if (CheckHitKey(KEY_INPUT_RIGHT)) {
 			player.FaceDirection = Player::Direction::Direction_Right;
+			player.AnimationFlame++;
 			player.dx = 2 + player.FloorDeltaX;
 		}
 		else {
+			player.AnimationFlame = 0;
 			player.dx = player.FloorDeltaX;
 		}
 
@@ -333,6 +348,8 @@ STATE game() {
 
 		// あたり判定を行う。
 		player.FloorDeltaX = 0;
+		player.CollidedDirection = Direction::None;
+
 		int DefX = player.x, DefY = player.y;
 		int DefDeltaX = player.dx, DefDeltaY = player.dy;
 		CollisionCheck(player, MapTiles, 32, -1);
@@ -340,6 +357,14 @@ STATE game() {
 
 		player.x = DefX; player.y = DefY;
 		CollisionCheck(player, MyMap, -1);
+
+		// 挟まり判定
+		if ((player.CollidedDirection & Direction::LeftAndRight) == Direction::LeftAndRight || (player.CollidedDirection & Direction::UpAndDown) == Direction::UpAndDown) {
+			player.deathcount2++;
+		}
+
+		clsDx();
+		printfDx("%d, dx = %d, dy = %d", player.CollidedDirection, player.dx, player.dy);
 
 		if (DefDeltaX - MyMap.DeltaX > 0) {
 			if (player.x > NewX) {
@@ -433,10 +458,10 @@ STATE game() {
 		}
 
 		if (player.FaceDirection == Player::Direction::Direction_Left) {
-			DrawTurnGraph(player.x, player.y, PlayerImageHandles[0], TRUE);
+			DrawTurnGraph(player.x, player.y, PlayerImageHandles[((player.AnimationFlame / 5) + 1) % 3], TRUE);
 		}
 		else {
-			DrawGraph(player.x, player.y, PlayerImageHandles[0], TRUE);
+			DrawGraph(player.x, player.y, PlayerImageHandles[((player.AnimationFlame / 5) + 1) % 3], TRUE);
 		}
 
 
