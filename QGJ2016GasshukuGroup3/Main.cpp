@@ -10,9 +10,9 @@ struct Player {
 	// 方向を表します。
 	enum Direction {
 		// 左向き
-		Direction_Left,
+		Direction_Left = 1,
 		// 右向き
-		Direction_Right
+		Direction_Right = 0
 	} FaceDirection;
 
 	bool OnCollideFromSide(int& tileid, int, int);
@@ -197,9 +197,9 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 
 	//音楽のための変数と読み込み
 	int Sound1, Sound2, Sound3;
-	Sound1 = LoadSoundMem("合宿QGJ_タイトル.ogg");
-	Sound2 = LoadSoundMem("合宿QGJ_メイン.ogg");
-	Sound3 = LoadSoundMem("合宿QGJ_リザルト");
+	Sound1 = LoadSoundMem("音楽/合宿QGJ_タイトル.ogg");
+	Sound2 = LoadSoundMem("音楽/合宿QGJ_メイン.ogg");
+	Sound3 = LoadSoundMem("音楽/合宿QGJ_リザルト.ogg");
 
 	// 背景の読み込み
 	int BackImageHandle = LoadGraph("Graphic/背景.jpg");
@@ -370,7 +370,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 		}
 		
 		// プレイヤー描画
-		for (int i = 0; i < MapTilesWidth; i++) {
+		/* for (int i = 0; i < MapTilesWidth; i++) {
 			for (int j = 0; j < MapTilesHeight; j++) {
 				if (MapTiles[i][j] == 0) {
 					DrawGraph(i * 32, j * 32, jimen, TRUE);
@@ -380,7 +380,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 				}
 				}
 			}
-		}*/
+		} */
 
 		// 背景の描画
 		DrawGraph(0, 0, BackImageHandle, FALSE);
@@ -393,7 +393,8 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 		for (int i = 0; i < MyMap.Cols(); i++) {
 			for (int j = 0; j < MyMap.Rows(); j++) {
 				if (MyMap[i][j] != -1 && MyMap[i][j] != 1) {
-					DrawBox(MyMap.X + i * 32, MyMap.Y + j * 32, MyMap.X + i * 32 + 32, MyMap.Y + j * 32 + 32, GetColor(0, 216, 0), TRUE);
+					DrawGraph(MyMap.X + i * 32, MyMap.Y + j * 32, jimen, TRUE);
+					// DrawBox(MyMap.X + i * 32, MyMap.Y + j * 32, MyMap.X + i * 32 + 32, MyMap.Y + j * 32 + 32, GetColor(0, 216, 0), TRUE);
 				}
 			}
 		}
