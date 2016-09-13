@@ -23,6 +23,7 @@ struct Player {
 Player player;
 static int ballcount = 0;
 static int bcount = 0;
+static int drillcount = 0;
 
 bool Player::OnCollideFromSide(int& tileid, int, int) {
 	x = 0;	
@@ -127,6 +128,14 @@ void moveBall(Tile* ball) {
 	}
 }
 
+void drillAttack(Tile* drill) {
+	for (int i = 0; i < drillcount; ++i) {
+		if (Checkhitchery(drill[i].x, drill[i].y, drill[i].width, drill [i].height, player.x, player.y, player.width, player.height)) {
+			player.deathcount2++;
+		}
+	}
+}
+
 void moveBridge(Tile *b) {
 	for (int i = 0; i < bcount; ++i) {
 		if ((player.x + player.width / 2) >= b[i].x && (player.y - b[i].y) < 5 ) {
@@ -138,13 +147,7 @@ void moveBridge(Tile *b) {
 }
 
 
-int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
-	ChangeWindowMode(TRUE);
-
-	if (DxLib_Init() == -1) {
-		return 0;
-	}
-	SetDrawScreen(DX_SCREEN_BACK);
+int game() {
 	// タイルマップとして使う２次元配列
 	const int MapTilesWidth = 20;
 	const int MapTilesHeight = 15;
@@ -214,7 +217,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 	}
 
 
-
+	drillcount = 2;
 	for (int i = 0; i < TILE_MAX; ++i) {
 		drill[i].height = 32;
 		drill[i].width = 32;
@@ -229,7 +232,10 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 	drill[1].dy = 0;
 
 	// メインループ
-	while (ProcessMessage() != -1 && ClearDrawScreen() != -1 && gpUpdateKey() == 0) {
+	while (true) {
+		if (ProcessMessage() == -1 || ClearDrawScreen() == -1 || gpUpdateKey() != 0) {
+			return -1;
+		}
 		mv.Update();
 		//音楽の再生
 		if (CheckSoundMem(Sound2) == 0) {
@@ -460,6 +466,5 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 
 			ScreenFlip();
 		}
-		DxLib_End();
 		return 0;
 	}
