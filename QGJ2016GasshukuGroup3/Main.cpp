@@ -6,6 +6,15 @@
 struct Player {
 	int x, y, width, height, dx, dy, fly,deathcount1,deathcount2;
 	int FloorDeltaX;
+
+	// 方向を表します。
+	enum Direction {
+		// 左向き
+		Direction_Left,
+		// 右向き
+		Direction_Right
+	} FaceDirection;
+
 	bool OnCollideFromSide(int& tileid, int, int);
 	bool OnCollideFromBottom(int& tileid, int, int);
 	bool OnCollideFromTop(int& tileid, int, int);
@@ -18,7 +27,7 @@ static int bcount = 0;
 bool Player::OnCollideFromSide(int& tileid, int, int) {
 	x = 0;	
 
-	if (tileid == 1) {
+	if (tileid == 1 || tileid == 5) {
 		return true;
 	}
 
@@ -29,7 +38,7 @@ bool Player::OnCollideFromSide(int& tileid, int, int) {
 bool Player::OnCollideFromBottom(int& tileid, int, int) {
 	fly = 0;//0のとき飛べる
 
-	if (tileid == 1) {
+	if (tileid == 1 || tileid == 5) {
 		return true;
 	}
 
@@ -41,6 +50,7 @@ bool Player::OnCollideFromBottom(int& tileid, int, int) {
 }
 
 bool Player::OnCollideFromTop(int& tileid, int i, int j) {
+
 	if (tileid == 1) {
 		// ブロックを実体化
 		tileid = 0;
@@ -49,11 +59,13 @@ bool Player::OnCollideFromTop(int& tileid, int i, int j) {
 		*(tileobjptr - 1) = 2;
 		*(tileobjptr - 15) = 2;
 		*(tileobjptr + 15) = 2;
-	}
-	else if (tileid == 2) {
+	} else if (tileid == 2) {
 		// 死亡
 		deathcount2++;
+	} else if (tileid == 5) {
+		return true;
 	}
+
 	return false;
 }
 
@@ -129,10 +141,10 @@ void Stage(int& x,int& y,Tile* ti,MapViewer &mv) {
 
 //1は敵２は自機、あたり判定
 bool Checkhitchery(int x1, int y1, int width1, int height1, int x2, int y2, int width2, int height2) {
-	if (x1 < (x2 + width2)) {
-		if ((x1 + width1) > x2) {
-			if (y1 < (y2 + height2)) {
-				if ((y1 + height1) > y2) {
+	if (x1 <= (x2 + width2)) {
+		if ((x1 + width1) >= x2) {
+			if (y1 <= (y2 + height2)) {
+				if ((y1 + height1) >= y2) {
 					return true;
 				}
 				return false;
@@ -198,6 +210,13 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 	Sound1 = LoadSoundMem("合宿QGJ_タイトル.ogg");
 	Sound2 = LoadSoundMem("合宿QGJ_メイン.ogg");
 	Sound3 = LoadSoundMem("合宿QGJ_リザルト");
+
+	// 背景の読み込み
+	int BackImageHandle = LoadGraph("Graphic/背景.jpg");
+	// プレイヤーの画像の読み込み
+	int PlayerImageHandles[3];
+	LoadDivGraph("Graphic/Character.png", 3, 3, 1, 32, 64, PlayerImageHandles);
+
 	int jimen = LoadGraph("Graphic/Jimen.png");
 	int hasi = LoadGraph("Graphic/Hasi.png");
 	int yokotoge = LoadGraph("Graphic/Yokotoge.png");
@@ -237,7 +256,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 			}
 		}
 	}
-			
+
 
 
 	for (int i = 0; i < TILE_MAX; ++i) {
@@ -263,9 +282,11 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 
 		// 入力に応じて、プレイヤーのスピードを変える
 		if (CheckHitKey(KEY_INPUT_LEFT)) {
+			player.FaceDirection = Player::Direction::Direction_Left;
 			player.dx = -2 + player.FloorDeltaX;
 		}
 		else if (CheckHitKey(KEY_INPUT_RIGHT)) {
+			player.FaceDirection = Player::Direction::Direction_Right;
 			player.dx = 2 + player.FloorDeltaX;
 		}
 		else {
@@ -366,22 +387,27 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 					if (MapTiles[j][i] == 3) {
 						bridge[bcount] = Tile{ j * 32, i * 32, 0, 00, 32, 32,true,true };
 						++bcount;
-					}
 				}
 			}
+		}
 		}
 		
 		// プレイヤー描画
 		for (int i = 0; i < MapTilesWidth; i++) {
 			for (int j = 0; j < MapTilesHeight; j++) {
 				if (MapTiles[i][j] == 0) {
-					DrawGraph(i * 32, j * 32, jimen, FALSE);
+					DrawGraph(i * 32, j * 32, jimen, TRUE);
 				}
 				else if (MapTiles[i][j] == 4) {
-					DrawGraph(i * 32, j * 32, hasi, FALSE);
+					DrawGraph(i * 32, j * 32, hasi, TRUE);
 				}
 			}
 		}
+		}
+
+		// 背景の描画
+		DrawGraph(0, 0, BackImageHandle, FALSE);
+
 		//落ちてくる球
 		for (int i = 0; i < ballcount; ++i) {
 			if(ball[i].flag)
@@ -407,7 +433,13 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 			}
 		}
 
-		DrawBox(player.x, player.y, player.x + player.width, player.y + player.height, GetColor(255, 255, 255), TRUE);
+		// DrawBox(player.x, player.y, player.x + player.width, player.y + player.height, GetColor(255, 255, 255), TRUE);
+		if (player.FaceDirection == Player::Direction::Direction_Left) {
+			DrawTurnGraph(player.x, player.y, PlayerImageHandles[0], TRUE);
+		} else {
+			DrawGraph(player.x, player.y, PlayerImageHandles[0], TRUE);
+		}
+
 
 		// 白色の値を取得
 		unsigned Cr;
