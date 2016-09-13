@@ -159,11 +159,10 @@ void moveBall(Tile* ball) {
 
 void moveBridge(Tile *b) {
 	for (int i = 0; i < bcount; ++i) {
-		if ((player.x + player.width / 2) >= b[i].x && (player.y - b[i].y) < 5 ) {
+		if ((player.x + player.width / 2) >= b[i].x && abs(player.y - b[i].y) < 100 && b[i].flag ) {
 			b[i].dy = 50;
 			b[i].flag = false;
 		}
-		b[i].y += b[i].dy;
 	}
 }
 
