@@ -178,9 +178,10 @@ void moveBridge(Tile *b) {
 		}
 	}
 }
-bool initflag = false;
+bool gameflag = false;
 int Sound1, Sound2, Sound3;
-int BackImageHandle, jimen, toge[4], hasi, ballHandle;
+int BackImageHandle, jimen, yokotoge, hasi, ballHandle;
+int timer;
 int PlayerImageHandles[3];
 CMap MyMap;
 MapViewer mv;
@@ -203,7 +204,7 @@ void Initialization(int map, MapViewer &mv) {
 	mv.SetData(map);
 }
 STATE game() {
-	if (!initflag) {
+	if (!gameflag) {
 		// タイルマップとして使う２次元配列
 
 		// タイルマップを -1 (何もない) で埋める
@@ -217,6 +218,9 @@ STATE game() {
 				}
 			}
 		}
+
+		//タイマー
+		timer = 0;
 
 		//音楽のための変数と読み込み
 		Sound1 = LoadSoundMem("音楽/合宿QGJ_タイトル.ogg");
@@ -274,13 +278,13 @@ STATE game() {
 				else if (MapTiles[j][i] >= drillsuf) {//動くトゲ
 					drill[drillcount] = Tile{ j * 32, i * 32, 0, 0, 32, 32,true,true, MapTiles[j][i] - drillsuf };
 					++drillcount;
-				}
 			}
 		}
+		}
 		STATE nextstate = TITLE;
-		initflag = true;
+		gameflag = true;
 	}
-	if (initflag) {
+	else{
 		// メインループ
 		mv.Update();
 
@@ -495,12 +499,66 @@ STATE game() {
 				}
 			}
 		}
+		++timer;
+		//三分経ったらゲームオーバー
+		if (timer == 180 * 60) {
+			titleflag = false;
+			gameflag = false;
+			if (CheckSoundMem(Sound2) == 1) {
+				StopSoundMem(Sound2);
+			}
+			return GAMEOVER;
+		}
 		mv.Draw();
-
+	}
 		return GAME;
 	}
-}
+
+
+bool resultflag = false;
+int resultHandle;
+int FontHandle2;
 
 STATE result() {
+	if (!resultflag) {
+		resultHandle = LoadGraph("Graphic/リザルト画面.png");
+		FontHandle = CreateFontToHandle(NULL, 40, 3, DX_FONTTYPE_ANTIALIASING);
+		FontHandle2 = CreateFontToHandle(NULL, 30, 3, DX_FONTTYPE_ANTIALIASING);
+		resultflag = true;
+	}
+	else {
+		DrawGraph(0, 0, resultHandle, false);
+		//DrawFormatString(50, 240, GetColor(0, 0, 0), "死亡回数 %d\n", player.deathcount2);
+		DrawFormatStringToHandle(50, 300, GetColor(0, 255, 0), FontHandle, "死亡回数 %3d回\n", player.deathcount2);
+		DrawFormatStringToHandle(50, 350, GetColor(0, 255, 0), FontHandle, "クリア時間 %3.0f秒\n", (double)timer / 60);
+		DrawStringToHandle(100, 400, "PRESS SPACE", GetColor(0, 0, 255), FontHandle2);
+		if (getKeyPress(KEY_INPUT_SPACE, PRESS_ONCE)) {
+			titleflag = false;
+			gameflag = false;
+			resultflag = false;
+			return TITLE;
+		}
+	}
 	return RESULT;
+}
+
+
+bool gameoverflag = false;
+int gameoverHandle;
+
+STATE gameover() {
+	if (!gameoverflag) {
+		gameoverHandle = LoadGraph("Graphic/gameover.png");
+		gameoverflag = true;
+	}
+	else {
+		DrawGraph(0, 0, gameoverHandle, true);
+		if (getKeyPress(KEY_INPUT_SPACE, PRESS_ONCE)) {
+			titleflag = false;
+			gameflag = false;
+			gameoverflag = false;
+			return TITLE;
+		}
+	}
+	return GAMEOVER;
 }

@@ -3,11 +3,12 @@
 #include "MapEditor.h"
 #include "Scenes.h"
 #include <cmath>
+
 int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int){
 	ChangeWindowMode(TRUE);
 	SetMainWindowText("神の名は");
 	DxLib_Init(), SetDrawScreen(DX_SCREEN_BACK);
-	STATE nextstate = TITLE;
+	STATE nextstate = RESULT;
 	// メインループ
 	while (true) {
 		if (ProcessMessage() == -1 || ClearDrawScreen() == -1 || gpUpdateKey() != 0) {
@@ -25,6 +26,9 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int){
 			break;
 		case RESULT:
 			nextstate = result();
+			break;
+		case GAMEOVER:
+			nextstate = gameover();
 			break;
 		default:
 			break;
