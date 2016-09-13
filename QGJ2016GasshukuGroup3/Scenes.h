@@ -1,4 +1,5 @@
 #pragma once
+#include "Particles.h"
 
 enum STATE {
 	EXIT = -1,
