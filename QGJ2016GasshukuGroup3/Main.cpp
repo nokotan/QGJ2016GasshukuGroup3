@@ -93,48 +93,10 @@ void Initialization(int map,MapViewer &mv) {
 }
 
 void Stage(int& x,int& y,Tile* ti,MapViewer &mv) {
-	int jimen = LoadGraph("Graphic/Jimen.png");
-	int hasi = LoadGraph("Graphic/Hasi.png");
-	int yokotoge = LoadGraph("Graphic/Yokotoge.png");
+	static int jimen = LoadGraph("Graphic/Jimen.png");
+	static int hasi = LoadGraph("Graphic/Hasi.png");
+	static int yokotoge = LoadGraph("Graphic/Yokotoge.png");
 
-	switch(stagenum){
-	case 1:
-		/*for (int i : {0, 1, 2, 6, 7, 8, 11, 12, 15, 16, 17, 18, 19}) {
-			if (jimen != -1) {
-				//’n–Ê‚Ì•`‰æ
-				DrawGraph(32 * i, 32 * 14, jimen, false);
-		}
-		}
-		for (int i : {9, 10, 13, 14}) {
-			if (hasi != -1) {
-				//‹´‚Ì•`‰æ
-				DrawGraph(32 * i, 32 * 14, hasi, true);
-		}
-		}*/
-		break;
-	case 2:
-		for (int i = 0; i < 20; ++i) {
-			if (jimen != -1) {
-				//’n–Ê‚Ì•`‰æ
-				DrawGraph(32 * i, 32 * 14, jimen, true);
-		}
-		}
-		 //‰¡‚É“®‚¢‚Ä‚­‚é‚Æ‚°
-		for (int i = 0; i < 2; ++i) {
-			if (abs(player.x - ti[i].x) < 32 * 2 && (ti[i].y - player.y) < 32 * 2) {
-				ti[i].dx = -10;
-			}
-			//‰¡Œü‚«‚Æ‚°•`‰æ
-			DrawGraph(ti[i].x, ti[i].y, yokotoge, true);
-		}
-		break;
-	}
-	if (x >= 608 && stagenum < 2) {
-		//ƒ}ƒbƒvˆÚ“®
-		x = 0;
-		++stagenum;
-		Initialization(stagenum,mv);
-	}
 }
 
 //1‚Í“G‚Q‚ÍŽ©‹@A‚ ‚½‚è”»’è
@@ -199,7 +161,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 	int Sound1, Sound2, Sound3;
 	Sound1 = LoadSoundMem("‡hQGJ_ƒ^ƒCƒgƒ‹.ogg");
 	Sound2 = LoadSoundMem("‡hQGJ_ƒƒCƒ“.ogg");
-	Sound3 = LoadSoundMem("‡hQGJ_ƒŠƒUƒ‹ƒg");
+	Sound3 = LoadSoundMem("‡hQGJ_ƒŠƒUƒ‹ƒg.ogg");
 
 	// ”wŒi‚Ì“Ç‚Ýž‚Ý
 	int BackImageHandle = LoadGraph("Graphic/”wŒi.jpg");
@@ -370,7 +332,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 		}
 		
 		// ƒvƒŒƒCƒ„[•`‰æ
-		for (int i = 0; i < MapTilesWidth; i++) {
+		/*for (int i = 0; i < MapTilesWidth; i++) {
 			for (int j = 0; j < MapTilesHeight; j++) {
 				if (MapTiles[i][j] == 0) {
 					DrawGraph(i * 32, j * 32, jimen, TRUE);
@@ -379,8 +341,8 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 					DrawGraph(i * 32, j * 32, hasi, TRUE);
 				}
 				}
-			}
-		}*/
+			}*/
+		
 
 		// ”wŒi‚Ì•`‰æ
 		DrawGraph(0, 0, BackImageHandle, FALSE);
@@ -413,6 +375,46 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 		DrawFormatString(500, 0,Cr, "Death Count %d",player.deathcount1);
 
 		Stage(player.x, player.y, drill,mv);
+
+
+		switch (stagenum) {
+		case 1:
+			for (int i : {0, 1, 2, 6, 7, 8, 11, 12, 15, 16, 17, 18, 19}) {
+			if (jimen != -1) {
+			//’n–Ê‚Ì•`‰æ
+			DrawGraph(32 * i, 32 * 14, jimen, false);
+			}
+			}
+			for (int i : {9, 10, 13, 14}) {
+			if (hasi != -1) {
+			//‹´‚Ì•`‰æ
+			DrawGraph(32 * i, 32 * 14, hasi, true);
+			}
+			}
+			break;
+		case 2:
+			for (int i = 0; i < 20; ++i) {
+				if (jimen != -1) {
+					//’n–Ê‚Ì•`‰æ
+					DrawGraph(32 * i, 32 * 14, jimen, true);
+				}
+			}
+			//‰¡‚É“®‚¢‚Ä‚­‚é‚Æ‚°
+			for (int i = 0; i < 2; ++i) {
+				if (abs(player.x - drill[i].x) < 32 * 2 && (drill[i].y - player.y) < 32 * 2) {
+					drill [i].dx = -10;
+				}
+				//‰¡Œü‚«‚Æ‚°•`‰æ
+				DrawGraph(drill[i].x, drill [i].y, yokotoge, true);
+			}
+			break;
+		}
+		if (player.x >= 608 && stagenum < 2) {
+			//ƒ}ƒbƒvˆÚ“®
+			player.x = 0;
+			++stagenum;
+			Initialization(stagenum, mv);
+		}
 		mv.Draw();
 		
 		ScreenFlip();
