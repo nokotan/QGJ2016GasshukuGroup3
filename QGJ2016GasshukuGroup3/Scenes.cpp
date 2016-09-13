@@ -450,6 +450,7 @@ STATE game() {
 
 		DrawFormatString(500, 0, Cr, "Death Count %d", player.deathcount1);
 		DrawFormatString(500, 20, Cr, "Stage %d", stagenum);
+		DrawFormatString(500, 40, Cr, "time %dmin %dsec", (180 - timer/60)/60,60- (timer/60));
 
 
 
@@ -492,7 +493,7 @@ STATE game() {
 		}
 		++timer;
 		//三分経ったらゲームオーバー
-		if (timer == 180 * 60) {
+		if (timer >= 180 * 60) {
 			titleflag = false;
 			gameflag = false;
 			if (CheckSoundMem(Sound2) == 1) {
