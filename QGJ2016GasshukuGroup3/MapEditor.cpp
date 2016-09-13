@@ -6,7 +6,7 @@ MapFragment::MapFragment(){};
 
 MapFragment::MapFragment(int _x, int _y, MAPSTATE _attribute, string _filePath) :x(_x), y(_y), attribute(_attribute), filePath(_filePath){
 	if (filePath != "") {
-		drawH = LoadGraph(filePath.c_str());
+		//drawH = LoadGraph(filePath.c_str());
 		GetGraphSize(drawH, &width, &height);
 	}
 };
@@ -43,9 +43,6 @@ MapViewer::MapViewer(int n){
 	const string PATH = "Data/Map/SaveData";
 	filePath = PATH + itos(n) + ".csv";
 	SetData(n);
-	string graph = ("Graphic/Map" + itos(n) + ".png");
-	handle = LoadGraph(graph.c_str());
-	GetGraphSize(handle, &mapW, &mapH);
 };
 
 void MapViewer::Update(){
@@ -68,13 +65,8 @@ void MapViewer::Update(){
 void MapViewer::Draw(){
 	DrawExtendGraph(BASISX, BASISY + 40, BASISX + mapW, BASISY + 40 + mapH, handle, TRUE);
 	if (getKeySwitched(KEY_INPUT_V)) {
-		/*for (auto n : fragments) {
-				n.DrawKind();
-		}*/
-		for (int i = 0; i < 15; ++i) {
-			for (int j = 0; j < 20; ++ j) {
-				DrawFormatString(j * 32, i * 32, white, "%d", fragments[pos(j,i)].GetAttribute());
-			}
+		for (auto n : fragments) {
+			n.DrawKind();
 		}
 	}
 	if (getKeySwitched(KEY_INPUT_I)){
@@ -85,6 +77,7 @@ void MapViewer::Draw(){
 void MapViewer::DrawInfo(){
 	DrawFormatString(0, 400, StringColor, "MapSize(W*H) = %d * %d, Imagenum = %d", mwidth, mheight,imagenum);
 	DrawFormatString(0,420,StringColor,"FragmentSize = %d ", fragments.size());
+	DrawFormatString(0, 380, StringColor, "filePath = %d ", filePath.c_str());
 }
 
 void MapViewer::SetData(int number){
