@@ -8,7 +8,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int){
 	// タイルマップとして使う２次元配列;
 	DxLib_Init(), SetDrawScreen(DX_SCREEN_BACK);
 	SetBackgroundColor(255, 255, 255);
-	STATE nextstate = TITLE;
+	STATE nextstate = ;
 	// メインループ
 	while (true) {
 		if (ProcessMessage() == -1 || ClearDrawScreen() == -1 || gpUpdateKey() != 0) {
