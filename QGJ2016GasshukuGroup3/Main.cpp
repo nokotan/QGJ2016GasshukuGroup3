@@ -371,9 +371,9 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 					if (MapTiles[j][i] == 3) {
 						bridge[bcount] = Tile{ j * 32, i * 32, 0, 00, 32, 32,true,true };
 						++bcount;
-					}
 				}
 			}
+		}
 		}
 		
 		// ”wŒi‚Ì•`‰æ
