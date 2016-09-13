@@ -11,9 +11,9 @@ struct Player {
 	// 方向を表します。
 	enum Direction {
 		// 左向き
-		Direction_Left,
+		Direction_Left = 1,
 		// 右向き
-		Direction_Right
+		Direction_Right = 0
 	} FaceDirection;
 
 	bool OnCollideFromSide(int& tileid, int, int);
@@ -26,7 +26,7 @@ static int ballcount = 0;
 static int bcount = 0;
 
 bool Player::OnCollideFromSide(int& tileid, int, int) {
-	x = 0;
+	x = 0;	
 
 	if (tileid == 1 || tileid == 5) {
 		return true;
@@ -165,9 +165,9 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 
 	//音楽のための変数と読み込み
 	int Sound1, Sound2, Sound3;
-	Sound1 = LoadSoundMem("合宿QGJ_タイトル.ogg");
-	Sound2 = LoadSoundMem("合宿QGJ_メイン.ogg");
-	Sound3 = LoadSoundMem("合宿QGJ_リザルト.ogg");
+	Sound1 = LoadSoundMem("音楽/合宿QGJ_タイトル.ogg");
+	Sound2 = LoadSoundMem("音楽/合宿QGJ_メイン.ogg");
+	Sound3 = LoadSoundMem("音楽/合宿QGJ_リザルト.ogg");
 
 	// 背景の読み込み
 	int BackImageHandle = LoadGraph("Graphic/背景.jpg");
@@ -357,79 +357,76 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 				if (MapTiles[j][i] == 0) {
 					DrawGraph(j * 32, i * 32, jimen, TRUE);
 				}
-				else if (MapTiles[j][i] == 4) {
-					DrawGraph(j * 32, i * 32, hasi, TRUE);
+		} */
+
+				// 背景の描画
+			DrawGraph(0, 0, BackImageHandle, FALSE);
+
+
+			//落ちてくる球
+			for (int i = 0; i < ballcount; ++i) {
+				if (ball[i].flag)
+					DrawGraph(ball[i].x, ball[i].y, ballHandle, TRUE);
+			}
+		
+			//落ちる橋
+			for (int i = 0; i < bcount; ++i) {
+				if (bridge[i].flag) {
+					DrawGraph(bridge[i].x, bridge[i].y, hasi, TRUE);
+				}
+				else if (bridge[i].flag2) {
+					int X = bridge[i].x / 32, Y = bridge[i].y / 32;
+					MapTiles[X][Y] = -1;
+					bridge[i].flag2 = false;
 				}
 			}
-		}
 
-		// 背景の描画
-		DrawGraph(0, 0, BackImageHandle, FALSE);
-
-
-		//落ちてくる球
-		for (int i = 0; i < ballcount; ++i) {
-			if (ball[i].flag)
-				DrawGraph(ball[i].x, ball[i].y, ballHandle, TRUE);
-		}
-		//落ちる橋
-		for (int i = 0; i < bcount; ++i) {
-			if (bridge[i].flag) {
-				DrawGraph(bridge[i].x, bridge[i].y, hasi, TRUE);
-			}
-			else if (bridge[i].flag2) {
-				int X = bridge[i].x / 32, Y = bridge[i].y / 32;
-				MapTiles[X][Y] = -1;
-				bridge[i].flag2 = false;
-			}
-		}
-
-		for (int i = 0; i < MyMap.Cols(); i++) {
-			for (int j = 0; j < MyMap.Rows(); j++) {
-				if (MyMap[i][j] != -1 && MyMap[i][j] != 1) {
-					DrawBox(MyMap.X + i * 32, MyMap.Y + j * 32, MyMap.X + i * 32 + 32, MyMap.Y + j * 32 + 32, GetColor(0, 216, 0), TRUE);
+			for (int i = 0; i < MyMap.Cols(); i++) {
+				for (int j = 0; j < MyMap.Rows(); j++) {
+					if (MyMap[i][j] != -1 && MyMap[i][j] != 1) {
+					DrawGraph(MyMap.X + i * 32, MyMap.Y + j * 32, jimen, TRUE);
+					// DrawBox(MyMap.X + i * 32, MyMap.Y + j * 32, MyMap.X + i * 32 + 32, MyMap.Y + j * 32 + 32, GetColor(0, 216, 0), TRUE);
+					}
 				}
 			}
-		}
 
-		if (player.FaceDirection == Player::Direction::Direction_Left) {
-			DrawTurnGraph(player.x, player.y, PlayerImageHandles[0], TRUE);
-		}
-		else {
-			DrawGraph(player.x, player.y, PlayerImageHandles[0], TRUE);
-		}
-
-
-		// 白色の値を取得
-		unsigned Cr;
-		Cr = GetColor(255, 255, 255);
-
-		DrawFormatString(500, 0, Cr, "Death Count %d", player.deathcount1);
-		DrawFormatString(500, 20, Cr, "Stage %d", stagenum);
-
-
-
-		switch (stagenum) {
-		case 2:
-			//横に動いてくるとげ
-			for (int i = 0; i < 2; ++i) {
-				if (abs(player.x - drill[i].x) < 32 * 2 && (drill[i].y - player.y) < 32 * 2) {
-					drill[i].dx = -10;
-				}
-				//横向きとげ描画
-				DrawGraph(drill[i].x, drill[i].y, yokotoge, true);
+			if (player.FaceDirection == Player::Direction::Direction_Left) {
+				DrawTurnGraph(player.x, player.y, PlayerImageHandles[0], TRUE);
+		} else {
+				DrawGraph(player.x, player.y, PlayerImageHandles[0], TRUE);
 			}
-			break;
-		}
-		if (player.x >= 608 && stagenum < 2) {
-			//マップ移動
-			player.x = 0;
-			++stagenum;
-			Initialization(stagenum, mv);
-		}
-		mv.Draw();
 
-		ScreenFlip();
+
+			// 白色の値を取得
+			unsigned Cr;
+			Cr = GetColor(255, 255, 255);
+
+			DrawFormatString(500, 0, Cr, "Death Count %d", player.deathcount1);
+			DrawFormatString(500, 20, Cr, "Stage %d", stagenum);
+
+
+
+			switch (stagenum) {
+			case 2:
+				//横に動いてくるとげ
+				for (int i = 0; i < 2; ++i) {
+					if (abs(player.x - drill[i].x) < 32 * 2 && (drill[i].y - player.y) < 32 * 2) {
+						drill[i].dx = -10;
+					}
+					//横向きとげ描画
+					DrawGraph(drill[i].x, drill[i].y, yokotoge, true);
+				}
+				break;
+			}
+			if (player.x >= 608 && stagenum < 2) {
+				//マップ移動
+				player.x = 0;
+				++stagenum;
+				Initialization(stagenum, mv);
+			}
+			mv.Draw();
+
+			ScreenFlip();
 
 		switch (nextstate)
 		{
@@ -447,7 +444,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 		default:
 			break;
 		}
+		}
+		DxLib_End();
+		return 0;
 	}
-	DxLib_End();
-	return 0;
-}
