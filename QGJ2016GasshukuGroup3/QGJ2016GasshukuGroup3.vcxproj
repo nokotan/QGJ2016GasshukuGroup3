@@ -97,7 +97,7 @@
       <SubSystem>Windows</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <AdditionalLibraryDirectories>C:\Users\Iwama Rin\Downloads\DxLib_VC\プロジェクトに追加すべきファイル_VC用;C:\Users\Owner\Documents\Visual Studio 2013\DxLib_VC\プロジェクトに追加すべきファイル_VC用;C:\Users\プロジェクトに追加すべきファイル_VC用</AdditionalLibraryDirectories>
-      <AdditionalLibraryDirectories>C:\Users\Owner\Documents\Visual Studio 2013\DxLib_VC\プロジェクトに追加すべきファイル_VC用;C:\Users\プロジェクトに追加すべきファイル_VC用;C:\Users\K-nishimoto\Downloads\DxLib_VC\プロジェクトに追加すべきファイル_VC用</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>C:\Users\Iwama Rin\Downloads\DxLib_VC\プロジェクトに追加すべきファイル_VC用;C:\Users\Owner\Documents\Visual Studio 2013\DxLib_VC\プロジェクトに追加すべきファイル_VC用;C:\Users\プロジェクトに追加すべきファイル_VC用;C:\Users\K-nishimoto\Downloads\DxLib_VC\プロジェクトに追加すべきファイル_VC用</AdditionalLibraryDirectories>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
