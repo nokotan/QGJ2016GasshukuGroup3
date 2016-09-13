@@ -87,7 +87,7 @@ void Stage(int& x,int& y,Tile* ti,MapViewer &mv) {
 
 	switch(stagenum){
 	case 1:
-		for (int i : {0, 1, 2, 6, 7, 8, 11, 12, 15, 16, 17, 18, 19}) {
+		/*for (int i : {0, 1, 2, 6, 7, 8, 11, 12, 15, 16, 17, 18, 19}) {
 			if (jimen != -1) {
 				//’n–Ê‚Ì•`‰æ
 				DrawGraph(32 * i, 32 * 14, jimen, false);
@@ -98,7 +98,7 @@ void Stage(int& x,int& y,Tile* ti,MapViewer &mv) {
 				//‹´‚Ì•`‰æ
 				DrawGraph(32 * i, 32 * 14, hasi, true);
 		}
-		}
+		}*/
 		break;
 	case 2:
 		for (int i = 0; i < 20; ++i) {
@@ -188,6 +188,9 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 	Sound1 = LoadSoundMem("‡hQGJ_ƒ^ƒCƒgƒ‹.ogg");
 	Sound2 = LoadSoundMem("‡hQGJ_ƒƒCƒ“.ogg");
 	Sound3 = LoadSoundMem("‡hQGJ_ƒŠƒUƒ‹ƒg");
+	int jimen = LoadGraph("Graphic/Jimen.png");
+	int hasi = LoadGraph("Graphic/Hasi.png");
+	int yokotoge = LoadGraph("Graphic/Yokotoge.png");
 	CMap MyMap { 30, 30 };
 	MyMap.Fill(-1);
 
@@ -345,13 +348,16 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 		}
 		
 		// ƒvƒŒƒCƒ„[•`‰æ
-		/* for (int i = 0; i < MapTilesWidth; i++) {
+		for (int i = 0; i < MapTilesWidth; i++) {
 			for (int j = 0; j < MapTilesHeight; j++) {
 				if (MapTiles[i][j] == 0) {
-					DrawBox(i * 32, j * 32, i * 32 + 32, j * 32 + 32, GetColor(0, 216, 0), TRUE);
+					DrawGraph(i * 32, j * 32, jimen, FALSE);
+				}
+				else if (MapTiles[i][j] == 4) {
+					DrawGraph(i * 32, j * 32, hasi, FALSE);
 				}
 			}
-		}*/
+		}
 		for (int i = 0; i < ballcount; ++i) {
 			if(ball[i].flag)
 			DrawBox(ball[i].x, ball[i].y, ball[i].x + ball[i].width, ball[i].y + ball[i].height, GetColor(0, 0, 222), TRUE);
