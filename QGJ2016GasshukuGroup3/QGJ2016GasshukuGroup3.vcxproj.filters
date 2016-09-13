@@ -1,0 +1,109 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="ソース ファイル">
+      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
+      <Extensions>cpp;c;cc;cxx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+    </Filter>
+    <Filter Include="ヘッダー ファイル">
+      <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
+      <Extensions>h;hh;hpp;hxx;hm;inl;inc;xsd</Extensions>
+    </Filter>
+    <Filter Include="リソース ファイル">
+      <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
+      <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="Main.cpp">
+      <Filter>ソース ファイル</Filter>
+    </ClCompile>
+    <ClCompile Include="Shape.cpp">
+      <Filter>ソース ファイル</Filter>
+    </ClCompile>
+    <ClCompile Include="Input.cpp">
+      <Filter>ソース ファイル</Filter>
+    </ClCompile>
+    <ClCompile Include="Object.cpp">
+      <Filter>ソース ファイル</Filter>
+    </ClCompile>
+    <ClCompile Include="MapEditor.cpp">
+      <Filter>ソース ファイル</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="Shape.h">
+      <Filter>ヘッダー ファイル</Filter>
+    </ClInclude>
+    <ClInclude Include="BaseUnit.h">
+      <Filter>ヘッダー ファイル</Filter>
+    </ClInclude>
+    <ClInclude Include="Collider.h">
+      <Filter>ヘッダー ファイル</Filter>
+    </ClInclude>
+    <ClInclude Include="DebugHelper.h">
+      <Filter>ヘッダー ファイル</Filter>
+    </ClInclude>
+    <ClInclude Include="MemberCheck.h">
+      <Filter>ヘッダー ファイル</Filter>
+    </ClInclude>
+    <ClCompile Include="Aonshiki.cpp">
+      <Filter>ソース ファイル</Filter>
+    </ClCompile>
+    <ClInclude Include="MapEditor.h">
+      <Filter>ヘッダー ファイル</Filter>
+    </ClInclude>
+    <ClInclude Include="Materials.h">
+      <Filter>ヘッダー ファイル</Filter>
+    </ClInclude>
+    <ClInclude Include="Object.h">
+      <Filter>ヘッダー ファイル</Filter>
+    </ClInclude>
+    <ClInclude Include="Input.h">
+      <Filter>ヘッダー ファイル</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <Image Include="Graphic\Character.png">
+      <Filter>リソース ファイル</Filter>
+    </Image>
+    <Image Include="Graphic\gameover.png">
+      <Filter>リソース ファイル</Filter>
+    </Image>
+    <Image Include="Graphic\Hasi.png">
+      <Filter>リソース ファイル</Filter>
+    </Image>
+    <Image Include="Graphic\Jimen.png">
+      <Filter>リソース ファイル</Filter>
+    </Image>
+    <Image Include="Graphic\Kakusi_block.png">
+      <Filter>リソース ファイル</Filter>
+    </Image>
+    <Image Include="Graphic\Tobira.png">
+      <Filter>リソース ファイル</Filter>
+    </Image>
+    <Image Include="Graphic\Toge.png">
+      <Filter>リソース ファイル</Filter>
+    </Image>
+    <Image Include="Graphic\Yokotoge.png">
+      <Filter>リソース ファイル</Filter>
+    </Image>
+    <Image Include="Graphic\タイトル画面.png">
+      <Filter>リソース ファイル</Filter>
+    </Image>
+    <Image Include="Graphic\ボス＜神＞.png">
+      <Filter>リソース ファイル</Filter>
+    </Image>
+    <Image Include="Graphic\ボス＜神の右腕＞.png">
+      <Filter>リソース ファイル</Filter>
+    </Image>
+    <Image Include="Graphic\背景.jpg">
+      <Filter>リソース ファイル</Filter>
+    </Image>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="音楽\合宿QGJ_タイトル.ogg" />
+    <None Include="音楽\合宿QGJ_メイン.ogg" />
+    <None Include="音楽\合宿QGJ_リザルト.ogg" />
+  </ItemGroup>
+</Project>
