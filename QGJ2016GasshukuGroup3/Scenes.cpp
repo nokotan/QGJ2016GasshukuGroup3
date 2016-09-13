@@ -4,7 +4,34 @@
 #include "Scenes.h"
 #include <cmath>
 
+bool titleflag = false;
+int titleHandle;
+int FontHandle;
 STATE title() {
+	if (!titleflag) {
+		titleHandle = LoadGraph("Graphic/タイトル画面.png");
+
+		// 作成したデータの識別番号を変数 FontHandle に保存する
+		FontHandle = CreateFontToHandle(NULL, 40, 3, DX_FONTTYPE_ANTIALIASING);
+		titleflag = true;
+	}
+	else {
+		// キーの入力待ち
+		if (getKeyPress(KEY_INPUT_SPACE,PRESS_ONCE)) {
+			// 作成したフォントデータを削除する
+			DeleteFontToHandle(FontHandle);
+			return GAME;
+		}
+
+		//タイトル描画
+		
+
+		// 読みこんだグラフィックを画面左上に描画
+		DrawGraph(0, 0, titleHandle, TRUE);
+		DrawStringToHandle(200, 400, "PRESS SPACE !!", GetColor(0, 255, 255), FontHandle);
+		//ScreenFlip();//描画の反映
+	}
+
 	return TITLE;
 }
 
