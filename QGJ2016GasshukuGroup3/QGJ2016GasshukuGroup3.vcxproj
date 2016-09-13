@@ -186,25 +186,6 @@
     <ClInclude Include="Object.h" />
     <ClInclude Include="Shape.h" />
   </ItemGroup>
-  <ItemGroup>
-    <Image Include="Graphic\Character.png" />
-    <Image Include="Graphic\gameover.png" />
-    <Image Include="Graphic\Hasi.png" />
-    <Image Include="Graphic\Jimen.png" />
-    <Image Include="Graphic\Kakusi_block.png" />
-    <Image Include="Graphic\Tobira.png" />
-    <Image Include="Graphic\Toge.png" />
-    <Image Include="Graphic\Yokotoge.png" />
-    <Image Include="Graphic\タイトル画面.png" />
-    <Image Include="Graphic\ボス＜神の右腕＞.png" />
-    <Image Include="Graphic\ボス＜神＞.png" />
-    <Image Include="Graphic\背景.jpg" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="音楽\合宿QGJ_タイトル.ogg" />
-    <None Include="音楽\合宿QGJ_メイン.ogg" />
-    <None Include="音楽\合宿QGJ_リザルト.ogg" />
-  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>
