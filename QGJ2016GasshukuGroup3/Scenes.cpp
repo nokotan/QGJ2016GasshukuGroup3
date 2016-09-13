@@ -74,6 +74,13 @@ bool Player::OnCollideFromSide(int& tileid, int, int) {
 		return true;
 	}
 
+	for (int tileid : { 2, 5, 6, 7, 8 }) {
+		if (tileid == tileid) {
+			// €–S
+			deathcount2++;
+		}
+	}
+
 	// •Ô‚è’l‚ğ false ‚É‚·‚é‚ÆA‚ ‚½‚è”»’è‚ğ–³‹‚µ‚È‚¢B
 	return false;
 }
@@ -85,8 +92,11 @@ bool Player::OnCollideFromBottom(int& tileid, int, int) {
 		return true;
 	}
 
-	if (tileid == 2) {
-		deathcount2++;
+	for (int id : { 2, 5, 6, 7, 8 }) {
+		if (tileid == id) {
+			// €–S
+			deathcount2++;
+		}
 	}
 
 	return false;
@@ -102,13 +112,15 @@ bool Player::OnCollideFromTop(int& tileid, int i, int j) {
 		*(tileobjptr - 1) = 2;
 		*(tileobjptr - 15) = 2;
 		*(tileobjptr + 15) = 2;
-	}
-	else if (tileid == 2) {
-		// €–S
-		deathcount2++;
-	}
-	else if (tileid == 5) {
+	} else if (tileid == 5) {
 		return true;
+	}
+
+	for (int id : { 2, 5, 6, 7, 8 }) {
+		if (tileid == id) {
+			// €–S
+			deathcount2++;
+		}
 	}
 
 	return false;
