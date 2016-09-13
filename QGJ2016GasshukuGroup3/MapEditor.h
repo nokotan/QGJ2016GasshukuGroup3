@@ -23,8 +23,6 @@ const unsigned int white = GetColor(255, 255, 255);
 const unsigned int black = GetColor(0, 0, 0);
 const unsigned int StringColor = red;
 const int X = 0, Y = 40;//マップの原点
-const int dx[8] = { 1, -1, 0, 0, 1, 1, -1, -1 };//右、左、下、上
-const int dy[8] = { 0, 0, 1, -1, 1, -1, 1, -1 };
 
 //グローバル変数	
 
@@ -49,16 +47,16 @@ class MapFragment{
 private:
 	string filePath;
 	int drawH, x, y, width, height;
-	MAPSTATE attribute;
+	int attribute;
 public:
 	MapFragment();
-	MapFragment(int,int,MAPSTATE,string);
+	MapFragment(int,int,int,string);
 	void Update();
 	void Draw();
 	void DrawKind();
 	bool LoadFail();
 	bool InMouseClick();
-	MAPSTATE GetAttribute();
+	int GetAttribute();
 	Pos GetPos();
 };
 

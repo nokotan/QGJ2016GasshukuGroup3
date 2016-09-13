@@ -4,7 +4,7 @@ using namespace std;
 
 MapFragment::MapFragment(){};
 
-MapFragment::MapFragment(int _x, int _y, MAPSTATE _attribute, string _filePath) :x(_x), y(_y), attribute(_attribute), filePath(_filePath){
+MapFragment::MapFragment(int _x, int _y, int _attribute, string _filePath) :x(_x), y(_y), attribute(_attribute), filePath(_filePath){
 	if (filePath != "") {
 		//drawH = LoadGraph(filePath.c_str());
 		GetGraphSize(drawH, &width, &height);
@@ -30,7 +30,7 @@ bool MapFragment::InMouseClick(){
 	return x <= getMouseX() && (getMouseX() <= x + width) && y <= getMouseY() && (getMouseY() <= y + height  ) && getMouseLeftPress(PRESS_ONCE);
 }
 
-MAPSTATE MapFragment::GetAttribute(){
+int MapFragment::GetAttribute(){
 	return attribute;
 }
 
@@ -144,10 +144,10 @@ void MapViewer::SetData(int number){
 		ss.str(ds[1]);
 		ss >> y;
 		if (y >= 0) {
-			fragments[pos(j, k)] = MapFragment(j*width + BASISX, k*height + BASISY+Y, (MAPSTATE)x, filepaths[y]);
+			fragments[pos(j, k)] = MapFragment(j*width + BASISX, k*height + BASISY+Y, y, "");
 		}
 		else {
-			fragments[pos(j, k)] = MapFragment(j*width + BASISX, k*height + BASISY+Y, NONE, "");
+			fragments[pos(j, k)] = MapFragment(j*width + BASISX, k*height + BASISY+Y, -1, "");
 		}
 		ss.str(empty_string);
 		ss.clear();
