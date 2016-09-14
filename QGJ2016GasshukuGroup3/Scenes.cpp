@@ -3,7 +3,6 @@
 #include "MapEditor.h"
 #include "Scenes.h"
 #include "Lift.h"
-
 #include <cmath>
 
 int Sound1, Sound2, Sound3;
@@ -583,7 +582,7 @@ STATE game() {
 		//死亡回数、ステージ、残り時間の表示
 		DrawFormatString(500, 0, Cr, "Death Count %d", player.deathcount1);
 		DrawFormatString(500, 20, Cr, "Stage %d", stagenum);
-		DrawFormatString(500, 40, Cr, "time %dmin %dsec", (180 - timer/60)/60,60 - (timer/60)%60);
+		DrawFormatString(500, 40, Cr, "time %dmin %02dsec", (180 - timer/60)/60, 60 - (timer / 60) % 60 == 60 ? 0 : 60 - (timer / 60) % 60);
 
 		if (player.x >= 608 && stagenum < 3) {
 			//マップ移動
