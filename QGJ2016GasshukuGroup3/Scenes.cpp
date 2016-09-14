@@ -992,9 +992,15 @@ STATE boss() {
 		enemy.Update();
 		enemy.Draw();
 		if (enemy.IsOver()) {
+			if (CheckSoundMem(enemy.bgm) == 0) {
+				StopSoundMem(enemy.bgm);
+			}
 			return GAMEOVER;
 		}
 		if (enemy.IsEnd()) {
+			if (CheckSoundMem(enemy.bgm) == 0) {
+				StopSoundMem(enemy.bgm);
+			}
 			return RESULT;
 		}
 	}
