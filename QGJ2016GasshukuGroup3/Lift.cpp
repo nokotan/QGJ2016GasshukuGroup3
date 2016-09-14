@@ -10,6 +10,10 @@ Lift::Lift() :
 	}
 }
 
+void Lift::Reset() {
+	Flames = 0;
+}
+
 void Lift::Update() {
 
 	switch (MyPattern) {

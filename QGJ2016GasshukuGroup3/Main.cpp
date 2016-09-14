@@ -8,7 +8,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int){
 	ChangeWindowMode(TRUE);
 	SetMainWindowText("神の名は。 -God name.-");
 	DxLib_Init(), SetDrawScreen(DX_SCREEN_BACK);
-	STATE nextstate = GAME;
+	STATE nextstate = TITLE;
 	// メインループ
 	while (true) {
 		if (ProcessMessage() == -1 || ClearDrawScreen() == -1 || gpUpdateKey() != 0) {

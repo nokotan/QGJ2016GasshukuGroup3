@@ -3,10 +3,11 @@
 #include "MapEditor.h"
 #include "Scenes.h"
 #include "Lift.h"
-
 #include <cmath>
 
 int Sound1, Sound2, Sound3;
+// 決定音
+int KetteiSound;
 
 
 bool titleflag = false;
@@ -19,7 +20,9 @@ STATE title() {
 		//音楽のための変数と読み込み
 		Sound1 = LoadSoundMem("音楽/合宿QGJ_タイトル.ogg");
 		Sound2 = LoadSoundMem("音楽/合宿QGJ_メイン.ogg");
+		ChangeVolumeSoundMem(128, Sound2);
 		Sound3 = LoadSoundMem("音楽/合宿QGJ_リザルト.ogg");
+		KetteiSound = LoadSoundMem("音楽/合宿QGJ_SE_決定音.ogg");
 
 		PlaySoundMem(Sound1, DX_PLAYTYPE_LOOP);
 
@@ -33,6 +36,7 @@ STATE title() {
 			// 作成したフォントデータを削除する
 			DeleteFontToHandle(FontHandle);
 			StopSoundMem(Sound1);
+			PlaySoundMem(KetteiSound, DX_PLAYTYPE_BACK);
 			return GAME;
 		}
 
@@ -88,11 +92,11 @@ bool Player::OnCollideFromSide(int& tileid, int, int) {
 }
 
 bool Player::OnCollideFromBottom(int& tileid, int, int) {
-	fly = 0;//0のとき飛べる
-
 	if (tileid == 3) {
 		return true;
 	}
+
+	fly = 0;//0のとき飛べる
 
 	for (int id : { 5, 6, 7, 8 }) {
 		if (tileid == id) {
@@ -241,14 +245,18 @@ void moveBridge(Tile *b) {
 		}
 	}
 }
+
 bool gameflag = false;
 int BackImageHandle, jimen,toge[4], hasi, ballHandle;
+int JumpSound, KilledSound;
 int timer;
 int PlayerImageHandles[3];
 CMap MyMap;
 MapViewer mv;
 vector<vector<int>> tmp(MapTilesHeight, vector<int>(MapTilesWidth, -1));
 Particle particle;
+
+
 //初期化する関数
 void Initialization(int map, MapViewer &mv) {
 	player.x = 0;
@@ -257,11 +265,14 @@ void Initialization(int map, MapViewer &mv) {
 	player.height = 64;
 	player.dx = 0;
 	player.dy = 0;
+	//player.deathcount1 = 0;
 
 	player.fly = 0;
 	ballcount = 0;
 	mv.SetData(map);
 }
+
+
 STATE game() {
 	if (!gameflag) {
 		// タイルマップとして使う２次元配列
@@ -280,7 +291,8 @@ STATE game() {
 
 		//タイマー
 		timer = 0;
-
+		//ステージの初期化
+		stagenum = 1;
 
 
 		// 背景の読み込み
@@ -294,6 +306,12 @@ STATE game() {
 			toge[i] = LoadGraph((string("Graphic/toge") + to_string(i)+ ".png").c_str());
 		}
 		ballHandle = LoadGraph("Graphic/ball.png");
+		JumpSound = LoadSoundMem("音楽/合宿QGJ_SE_ジャンプ.ogg");
+		KilledSound = LoadSoundMem("音楽/合宿QGJ_SE_死亡.ogg");
+
+		for (auto& item : Lifts) {
+			item.Reset();
+		}
 
 		Lifts[0].MyPattern = Lift::Side;
 		Lifts[0].X = 0;
@@ -305,7 +323,7 @@ STATE game() {
 		Lifts[2].X = 32 * 10;
 		Lifts[2].Y = 32 * 4;
 		Lifts[3].MyPattern = Lift::UpAndDown;
-		Lifts[3].X = 0;
+		Lifts[3].X = 32;
 		Lifts[3].Y = 32 * 6;
 		LiftCount = 4;
 
@@ -380,6 +398,7 @@ STATE game() {
 		}
 
 		if (CheckHitKey(KEY_INPUT_SPACE) && player.fly == 0) { // && player.dy == 0) {
+			PlaySoundMem(JumpSound, DX_PLAYTYPE_BACK);
 			player.dy = -20;
 			player.fly = 1;
 		}
@@ -419,47 +438,53 @@ STATE game() {
 		int DefDeltaX = player.dx, DefDeltaY = player.dy;
 		CollisionCheck(player, MapTiles, 32, -1);
 		int NewX = player.x, NewY = player.y;
+		int TempCollideDirection = Direction::None;
+		TempCollideDirection = player.CollidedDirection;
 
 		for (int i = 0; i < LiftCount; i++) {
+			player.CollidedDirection = Direction::None;
 			player.x = DefX; player.y = DefY;
 			CollisionCheck(player, Lifts[i].GetCollider(), -1);
 
 			if (DefDeltaX - Lifts[i].GetCollider().DeltaX > 0) {
-				if (player.x <= NewX) {
+				if (static_cast<bool>(player.CollidedDirection & Direction::Right) && player.x <= NewX) {
 					NewX = player.x;
 				}
-			}
-			else {
-				if (player.x >= NewX) {
+			} else if (DefDeltaX - Lifts[i].GetCollider().DeltaX < 0) {
+				if (static_cast<bool>(player.CollidedDirection & Direction::Left) && player.x >= NewX) {
 					NewX = player.x;
 				}
 			}
 
 			if (DefDeltaY - Lifts[i].GetCollider().DeltaY > 0) {
-				if (player.y <= NewY) {
+				if (static_cast<bool>(player.CollidedDirection & Direction::Down) && player.y <= NewY) {
 					NewY = player.y;
 				}
 			}
-			else {
-				if (player.y >= NewY) {
+			else if (DefDeltaY - Lifts[i].GetCollider().DeltaY < 0) {
+				if (static_cast<bool>(player.CollidedDirection & Direction::Up) && player.y >= NewY) {
 					NewY = player.y;
 				}
 			}
+
+			TempCollideDirection |= player.CollidedDirection;
 		}
 
 		player.x = NewX;
 		player.y = NewY;
 
 		// 挟まり判定
-		if ((player.CollidedDirection & Direction::LeftAndRight) == Direction::LeftAndRight || (player.CollidedDirection & Direction::UpAndDown) == Direction::UpAndDown) {
+		if ((TempCollideDirection & Direction::LeftAndRight) == Direction::LeftAndRight || (TempCollideDirection & Direction::UpAndDown) == Direction::UpAndDown) {
 			player.deathcount2++;
 		}
 
 		clsDx();
-		printfDx("%d, dx = %d, dy = %d", player.CollidedDirection, player.dx, player.dy);
+		printfDx("Player\nCollideDirection : %d\nx : %d\ndx : %d\ndy : %d", player.CollidedDirection, player.x, player.dx, player.dy);
 
 		//死んだらdeathcountを増やし仕掛けが元に戻る。playerは中間に飛ぶ(死亡処理)
 		if (player.deathcount1 < player.deathcount2) {
+			PlaySoundMem(KilledSound, DX_PLAYTYPE_BACK);
+
 			player.deathcount1 = player.deathcount2;
 			for (int i = 0; i < 30; ++i) {
 				auto p = (new Particle(player.x,player.y));
@@ -560,15 +585,16 @@ STATE game() {
 		}
 
 
-		// 白色の値を取得
+		// 黒色の値を取得
 		unsigned Cr;
-		Cr = GetColor(255, 255, 255);
+		Cr = GetColor(0, 0, 0);
 
+		//死亡回数、ステージ、残り時間の表示
 		DrawFormatString(500, 0, Cr, "Death Count %d", player.deathcount1);
 		DrawFormatString(500, 20, Cr, "Stage %d", stagenum);
-		DrawFormatString(500, 40, Cr, "time %dmin %dsec", (180 - timer/60)/60,60 - (timer/60)%60);
+		DrawFormatString(500, 40, Cr, "time %dmin %02dsec", (180 - timer/60)/60, 60 - (timer / 60) % 60 == 60 ? 0 : 60 - (timer / 60) % 60);
 
-		if (player.x >= 608 && stagenum < 3) {
+		if (player.x >= 608 && stagenum < 5) {
 			//マップ移動
 			player.x = 0;
 			++stagenum;
@@ -961,7 +987,10 @@ STATE result() {
 		DrawFormatStringToHandle(50, 300, GetColor(0, 255, 0), FontHandle, "死亡回数 %3d回\n", player.deathcount2);
 		DrawFormatStringToHandle(50, 350, GetColor(0, 255, 0), FontHandle, "クリア時間 %3.1f秒\n", (double)timer / 60);
 		DrawStringToHandle(100, 400, "PRESS SPACE", GetColor(0, 0, 255), FontHandle2);
+		player.deathcount1 = 0;
+		player.deathcount2 = 0;
 		if (getKeyPress(KEY_INPUT_SPACE, PRESS_ONCE)) {
+			player.deathcount1 = 0;
 			titleflag = false;
 			gameflag = false;
 			resultflag = false;
@@ -982,6 +1011,8 @@ STATE gameover() {
 	}
 	else {
 		DrawGraph(0, 0, gameoverHandle, true);
+		player.deathcount1 = 0;
+		player.deathcount2 = 0;
 		if (getKeyPress(KEY_INPUT_SPACE, PRESS_ONCE)) {
 			titleflag = false;
 			gameflag = false;
