@@ -30,6 +30,7 @@ private:
 
 
 #include <xutility>
+#include <stdexcept>
 #include <memory>
 
 template <class Type>
@@ -270,7 +271,7 @@ public:
 
 	/// <summary>空のタイルマップを作成します。</summary>
 	Map() : Tiles(nullptr), Width(0), Height(0), IsTilesCopyed(false) {
-		DefaultMap = *this;
+		//DefaultMap = *this;
 	};
 
 	/// <summary>指定した大きさのタイルマップを作成します。</summary>
@@ -279,7 +280,7 @@ public:
 	Map(int width, int height) : Map() {
 		Create(width, height);
 
-		DefaultMap = *this;
+		//DefaultMap = *this;
 	};
 
 	/// <summary>指定した大きさのタイルマップを作成し、指定した値で埋めます。</summary>
@@ -289,7 +290,7 @@ public:
 		Create(width, height);
 		Fill(val);
 
-		DefaultMap = *this;
+		//DefaultMap = *this;
 	};
 
 	/// <summary>指定した大きさのタイルマップを作成し、指定した値で埋めます。</summary>
@@ -299,7 +300,7 @@ public:
 		Create(width, height);
 		Fill(val);
 
-		DefaultMap = *this;
+		//DefaultMap = *this;
 	};
 
 	template <size_t width, size_t height>
@@ -326,7 +327,7 @@ public:
 
 		delete[] newtiles;
 
-		DefaultMap = *this;
+		//DefaultMap = *this;
 	}
 
 	~Map() {
@@ -448,11 +449,11 @@ public:
 	
 
 	// インスタンス
-	static Map DefaultMap;
+	// static Map DefaultMap;
 };
 
-template <class Type>
-Map<Type> Map<Type>::DefaultMap = Map<Type>();
+//template <class Type>
+//Map<Type> Map<Type>::DefaultMap = Map<Type>();
 
 typedef Map<MapTile::Type> CMap;
 
