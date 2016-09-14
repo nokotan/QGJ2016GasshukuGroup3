@@ -64,14 +64,6 @@ void MapViewer::Update(){
 
 void MapViewer::Draw(){
 	DrawExtendGraph(BASISX, BASISY + 40, BASISX + mapW, BASISY + 40 + mapH, handle, TRUE);
-	if (getKeySwitched(KEY_INPUT_V)) {
-		for (auto n : fragments) {
-			n.DrawKind();
-		}
-	}
-	if (getKeySwitched(KEY_INPUT_I)){
-		DrawInfo();
-	}
 }
 
 void MapViewer::DrawInfo(){

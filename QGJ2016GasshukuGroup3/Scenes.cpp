@@ -706,13 +706,15 @@ void Boss::Init() {
 	arm = LoadGraph("Graphic/GodArm.png");
 	bgm = LoadSoundMem("âπäy/çáèhQGJ_É{ÉXêÌ.ogg");
 	ax = -40, ay = -100;
-	pattern = GetRand(3);
 	gameover = false;
 	time = 0;
 	maxhp = hp = 6;
 	player.x = 60, player.y = 100;
 	//ÉgÉQ
 	tile = vector<vector<Rect>>(W, vector<Rect>(H));
+	for (int i = 0; i < TILE_MAX; ++i) {
+		drill[i] = {};
+	}
 	for (int i = 0; i < W; ++i) {
 		for (int j = 0; j < H; ++j) {
 			MapTiles[i][j] = -1;
@@ -752,7 +754,7 @@ void Boss::Init() {
 	}
 	//ë´èÍ
 	for (int i : {1, 3,5, 13,15,17}) {
-		int j = 10;
+		int j = 9;
 		tile[i][j].PosSet(Pos(i*32,j*32));
 		tile[i][j].SetHandle(jimen);
 		tile[i][j].SetPattern(1, 0);
@@ -760,7 +762,7 @@ void Boss::Init() {
 		MapTiles[i][j] = 0;
 	}
 	for (int i : {7,9,11}) {
-		int j = 11;
+		int j = 10;
 		tile[i][j].PosSet(Pos(i*32,j*32));
 		tile[i][j].SetHandle(jimen);
 		tile[i][j].SetPattern(1, 0);
@@ -768,7 +770,7 @@ void Boss::Init() {
 		MapTiles[i][j] = 0;
 	}
 	for (int i : {2,4,14,16}) {
-		int j = 10;
+		int j = 9;
 		tile[i][j].PosSet(Pos(i*32,j*32));
 		tile[i][j].SetHandle(jimen);
 		tile[i][j].SetPattern(2, 0);
@@ -776,7 +778,7 @@ void Boss::Init() {
 		MapTiles[i][j] = 0;
 	}
 	for (int i : {6,8,10,12}) {
-		int j = 11;
+		int j = 10;
 		tile[i][j].PosSet(Pos(i*32,j*32));
 		tile[i][j].SetHandle(jimen);
 		tile[i][j].SetPattern(2, 0);
@@ -784,14 +786,14 @@ void Boss::Init() {
 		MapTiles[i][j] = 0;
 	}
 	for (int i : {3, 15}) {
-		int j = 7;
+		int j = 6;
 		tile[i][j].PosSet(Pos(i*32,j*32));
 		tile[i][j].SetHandle(jimen);
 		tile[i][j].SetPattern(0, 0);
 		tile[i][j].kind = 0;
 		MapTiles[i][j] = 0;
 	}
-	int x = 9, y = 8;
+	int x = 9, y = 7;
 	tile[x][y].PosSet(Pos(x * 32, y * 32));
 	tile[x][y].SetHandle(jimen);
 	tile[x][y].SetPattern(0, 0);
@@ -852,7 +854,7 @@ void Boss::Update() {
 			particle.Factory(pt);
 		}
 		player.deathcount1 = player.deathcount2;
-		maxhp = hp = 10;
+		maxhp = hp = 6;
 		player.x = 60, player.y = 100;
 		player.fly = 0;
 		player.deathcount2++;
@@ -863,7 +865,7 @@ void Boss::Update() {
 			auto pt = new Particle(player.x, player.y);
 			particle.Factory(pt);
 		}
-		maxhp = hp = 10;
+		maxhp = hp = 6;
 		player.x = 60, player.y = 100;
 	}
 	particle.UpdateParticles();
@@ -873,7 +875,8 @@ void Boss::Update() {
 	}
 	if (time >= 300) {
 		int i, j,k =0,dir;
-		switch (pattern)
+		hp = 6;
+		switch (hp)
 		{
 		case 6:
 		case 5:
@@ -882,7 +885,7 @@ void Boss::Update() {
 			dir = (i == 0) ? 3: 1;
 			for (j = 0; j < H; ++j) {
 				if (MapTiles[i][j] >= drillsuf - 4 && GetRand(1)) {//ìÆÇ≠ÉgÉQ
-					drill[k] = Tile{ i * 32, j * 32, 0, 0, 32, 32,true,true, dir };
+					drill[k] = Tile{ (i + k * dx[dir]) * 32, j * 32, 0, 0, 32, 32,true,true, dir };
 					++k;
 					if (k == drillcount) {
 						break;
@@ -898,7 +901,7 @@ void Boss::Update() {
 			dir = (j == 0) ? 2 : 0;
 			for (i = 0; i < W; ++i) {
 				if (MapTiles[i][j] >= drillsuf - 4 && GetRand(1)) {//ìÆÇ≠ÉgÉQ
-					drill[k] = Tile{ i * 32, j * 32, 0, 0, 32, 32,true,true, dir };
+					drill[k] = Tile{ i * 32, (j + k*dy[dir]) * 32, 0, 0, 32, 32,true,true, dir };
 					++k;
 					if (k == drillcount) {
 						break;
@@ -913,7 +916,8 @@ void Boss::Update() {
 			for (i = 0; i < W; ++i) {
 				for (j = 0; j < H; ++j) {
 					if (MapTiles[i][j] >= 5 && GetRand(1)) {//ìÆÇ≠ÉgÉQ
-						drill[k] = Tile{ i * 32, j * 32, 0, 0, 32, 32,true,true, MapTiles[i][j] - 5 };
+						int dir = MapTiles[i][j] - 5;
+						drill[k] = Tile{ (i + dx[dir] * k) * 32, (j + dy[dir] * k) * 32, 0, 0, 32, 32,true,true, dir };
 						++k;
 						if (k == drillcount) {
 							i = W;
@@ -927,6 +931,7 @@ void Boss::Update() {
 		default:
 			break;
 		}
+		--hp;
 	}
 }
 
@@ -943,7 +948,7 @@ void Boss::Draw() {
 		}
 		else {
 			ci = polar(abs(ci), arg(ci) + DTOR(-45.0));
-			ax = real(ci) + 20, ay = imag(ci);
+			ax = real(ci) + 25, ay = imag(ci);
 		}
 		if (time2 > 60) {
 			flag = false;
@@ -992,9 +997,15 @@ STATE boss() {
 		enemy.Update();
 		enemy.Draw();
 		if (enemy.IsOver()) {
+			if (CheckSoundMem(enemy.bgm) == 0) {
+				StopSoundMem(enemy.bgm);
+			}
 			return GAMEOVER;
 		}
 		if (enemy.IsEnd()) {
+			if (CheckSoundMem(enemy.bgm) == 0) {
+				StopSoundMem(enemy.bgm);
+			}
 			return RESULT;
 		}
 	}
