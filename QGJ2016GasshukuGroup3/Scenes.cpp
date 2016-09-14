@@ -292,6 +292,10 @@ STATE game() {
 		}
 		ballHandle = LoadGraph("Graphic/ball.png");
 
+		for (auto& item : Lifts) {
+			item.Reset();
+		}
+
 		Lifts[0].MyPattern = Lift::Side;
 		Lifts[0].X = 0;
 		Lifts[0].Y = 32 * 12;
