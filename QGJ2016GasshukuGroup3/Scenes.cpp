@@ -801,6 +801,8 @@ void Boss::Init() {
 	MapTiles[x][y] = 0;
 }
 
+int ThrowSound = -1;
+
 void Boss::Update() {
 	++time;
 	for (int i = 0; i < W; ++i) {
@@ -872,6 +874,7 @@ void Boss::Update() {
 	if (time >= 270 && !flag) {
 		flag = true;
 		time2 = 0;
+		PlaySoundMem(ThrowSound, DX_PLAYTYPE_BACK);
 	}
 	if (time >= 300) {
 		int i, j,k =0,dir;
@@ -992,6 +995,10 @@ STATE boss() {
 		bossflag = true;
 		SetLoopPosSoundMem(9600, enemy.bgm);
 		PlaySoundMem(enemy.bgm, DX_PLAYTYPE_LOOP);
+
+		if (ThrowSound == -1) {
+			ThrowSound = LoadSoundMem("音楽/合宿QGJ_SE_ハンマー振り下ろし.ogg");
+		}
 	}
 	else {
 		enemy.Update();
