@@ -609,7 +609,7 @@ STATE game() {
 		DrawFormatString(500, 40, Cr, "time %dmin %02dsec", (180 - timer/60)/60, 60 - (timer / 60) % 60 == 60 ? 0 : 60 - (timer / 60) % 60);
 
 		if (player.x >= 608) {
-			if (stagenum >= 0) {
+			if (stagenum >= 5) {
 				gameflag = false;
 				if (CheckSoundMem(Sound2) == 1) {
 					StopSoundMem(Sound2);
