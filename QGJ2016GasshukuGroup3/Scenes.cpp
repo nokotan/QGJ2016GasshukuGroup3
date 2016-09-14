@@ -420,7 +420,8 @@ STATE game() {
 		int DefDeltaX = player.dx, DefDeltaY = player.dy;
 		CollisionCheck(player, MapTiles, 32, -1);
 		int NewX = player.x, NewY = player.y;
-		int TempCollideDirection = player.CollidedDirection;
+		int TempCollideDirection = Direction::None;
+		TempCollideDirection = player.CollidedDirection;
 
 		for (int i = 0; i < LiftCount; i++) {
 			player.CollidedDirection = Direction::None;

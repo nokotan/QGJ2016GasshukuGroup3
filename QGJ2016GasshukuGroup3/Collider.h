@@ -169,6 +169,8 @@ struct CollisionCheckHelper {
 							newX = tilerect.X + tilerect.Width - (rectX.X - newX);
 							obj.dx = layor.GetDeltaX();
 							obj.CollidedDirection |= Direction::Left;
+						} else {
+							obj.CollidedDirection |= Direction::LeftAndRight;
 						}
 					}
 
