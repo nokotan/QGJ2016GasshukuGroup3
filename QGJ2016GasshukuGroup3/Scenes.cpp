@@ -3,7 +3,11 @@
 #include "MapEditor.h"
 #include "Scenes.h"
 #include "Lift.h"
+#include <complex>
 #include <cmath>
+#include<algorithm>
+
+using namespace std;
 
 int Sound1, Sound2, Sound3;
 // Œˆ’è‰¹
@@ -845,7 +849,7 @@ void Boss::Update() {
 		player.x = 60, player.y = 100;
 	}
 	particle.UpdateParticles();
-	if (time >= 270) {
+	if (time >= 270 && !flag) {
 		flag = true;
 		time2 = 0;
 	}
@@ -914,10 +918,18 @@ void Boss::Draw() {
 	}
 	else {
 		++time2;
-		if (time2 < 60) {
+		complex<double> ci(-40, -100);
+		if (time2 < 30) {
+			ci = polar(abs(ci), arg(ci) + DTOR(45.0));
+			ax = real(ci), ay = imag(ci);
+		}
+		else {
+			ci = polar(abs(ci), arg(ci) + DTOR(-45.0));
+			ax = real(ci) + 20, ay = imag(ci);
+		}
+		if (time2 > 60) {
 			flag = false;
 		}
-		ax = -40 * cos(time), ay = - 100 * sin(time);
 	}
 	DrawGraph(ax, ay, arm, TRUE);
 	DrawGraph(0, 0, body, TRUE);
