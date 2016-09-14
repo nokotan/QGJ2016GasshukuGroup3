@@ -374,7 +374,6 @@ STATE game() {
 			}
 		}
 		gameflag = true;
-		return GAME;
 	}
 	else{
 		// 強制終了コマンド
@@ -609,7 +608,7 @@ STATE game() {
 		DrawFormatString(500, 40, Cr, "time %dmin %02dsec", (180 - timer/60)/60, 60 - (timer / 60) % 60 == 60 ? 0 : 60 - (timer / 60) % 60);
 
 		if (player.x >= 608) {
-			if (stagenum >= 0) {
+			if (stagenum >= 5) {
 				gameflag = false;
 				if (CheckSoundMem(Sound2) == 1) {
 					StopSoundMem(Sound2);
@@ -867,6 +866,8 @@ void Boss::Update() {
 		}
 		maxhp = hp = 6;
 		player.x = 60, player.y = 100;
+		time = 0;
+		return;
 	}
 	particle.UpdateParticles();
 	if (time >= 270 && !flag) {
@@ -875,7 +876,6 @@ void Boss::Update() {
 	}
 	if (time >= 300) {
 		int i, j,k =0,dir;
-		hp = 6;
 		switch (hp)
 		{
 		case 6:
