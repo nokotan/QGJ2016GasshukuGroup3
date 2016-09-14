@@ -23,7 +23,7 @@ using Vector = Pos;
 class Object{
 protected:
 	int handle, num;
-	double *time;
+	int time;
 	string path;
 	bool fail,flag;
 public:
@@ -33,10 +33,9 @@ public:
 	~Object() {};
 	Object(double, double, char*);
 	virtual void Init(){};
-	virtual void Update(Object *);
-	virtual void Draw(Object *);
+	virtual void Update();
+	virtual void Draw();
 	bool InMouseClick();
-	bool InMouseDoubleClick();
 	bool InMousePointer();
 	Pos GetPosition();
 	void PosSet(Pos);
@@ -54,6 +53,7 @@ public:
 };
 
 class Rect :public Object{
+	int kind;
 public:
 	Pos p[4];
 	Rect(){};
@@ -63,6 +63,8 @@ public:
 		p[2] = p2;//  |		  |
 		p[3] = p3;//  p2------p3
 	};
+	void Draw();
+	void SetHandle(int);
 };
 
 
