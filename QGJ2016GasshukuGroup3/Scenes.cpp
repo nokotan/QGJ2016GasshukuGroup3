@@ -150,10 +150,10 @@ static int LiftCount = 0;
 
 //1‚Í“G‚Q‚Í©‹@A‚ ‚½‚è”»’è
 bool Checkhitchery(int x1, int y1, int width1, int height1, int x2, int y2, int width2, int height2) {
-	if (x1 <= (x2 + width2)) {
-		if ((x1 + width1) >= x2) {
-			if (y1 <= (y2 + height2) ) {
-				if ((y1 + height1) >= y2) {
+	if (x1 < (x2 + width2)) {
+		if ((x1 + width1) > x2) {
+			if (y1 < (y2 + height2) ) {
+				if ((y1 + height1) >y2) {
 					return true;
 				}
 				return false;
@@ -641,7 +641,7 @@ STATE result() {
 		DrawGraph(0, 0, resultHandle, false);
 		//DrawFormatString(50, 240, GetColor(0, 0, 0), "€–S‰ñ” %d\n", player.deathcount2);
 		DrawFormatStringToHandle(50, 300, GetColor(0, 255, 0), FontHandle, "€–S‰ñ” %3d‰ñ\n", player.deathcount2);
-		DrawFormatStringToHandle(50, 350, GetColor(0, 255, 0), FontHandle, "ƒNƒŠƒAŠÔ %3.0f•b\n", (double)timer / 60);
+		DrawFormatStringToHandle(50, 350, GetColor(0, 255, 0), FontHandle, "ƒNƒŠƒAŠÔ %3.1f•b\n", (double)timer / 60);
 		DrawStringToHandle(100, 400, "PRESS SPACE", GetColor(0, 0, 255), FontHandle2);
 		if (getKeyPress(KEY_INPUT_SPACE, PRESS_ONCE)) {
 			titleflag = false;
