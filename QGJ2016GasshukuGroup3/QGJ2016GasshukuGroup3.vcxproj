@@ -170,6 +170,7 @@
   <ItemGroup>
     <ClCompile Include="Particles.cpp" />
     <ClCompile Include="Lift.cpp" />
+    <ClCompile Include="SousaSetsumei.cpp" />
     <ClCompile Include="title.cpp" />
     <ClCompile Include="Input.cpp" />
     <ClCompile Include="Main.cpp" />

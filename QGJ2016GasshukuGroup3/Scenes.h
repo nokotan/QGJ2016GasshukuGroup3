@@ -9,6 +9,7 @@ enum STATE {
 	BOSS,
 	RESULT,
 	GAMEOVER,
+	SETSUMEI
 };
 
 class Boss : public Rect{
@@ -35,3 +36,4 @@ STATE game();
 STATE boss();
 STATE result();
 STATE gameover();
+STATE setsumei();
