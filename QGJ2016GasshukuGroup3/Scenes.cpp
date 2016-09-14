@@ -557,7 +557,7 @@ STATE game() {
 
 		DrawFormatString(500, 0, Cr, "Death Count %d", player.deathcount1);
 		DrawFormatString(500, 20, Cr, "Stage %d", stagenum);
-		DrawFormatString(500, 40, Cr, "time %dmin %dsec", (180 - timer/60)/60,60- (timer/60));
+		DrawFormatString(500, 40, Cr, "time %dmin %dsec", (180 - timer/60)/60,60 - (timer/60)%60);
 
 		if (player.x >= 608 && stagenum < 3) {
 			//ƒ}ƒbƒvˆÚ“®
