@@ -4,12 +4,22 @@
 #include "Scenes.h"
 #include <cmath>
 
+int Sound1, Sound2, Sound3;
+
+
 bool titleflag = false;
 int titleHandle;
 int FontHandle;
 STATE title() {
 	if (!titleflag) {
 		titleHandle = LoadGraph("Graphic/タイトル画面.png");
+
+		//音楽のための変数と読み込み
+		Sound1 = LoadSoundMem("音楽/合宿QGJ_タイトル.ogg");
+		Sound2 = LoadSoundMem("音楽/合宿QGJ_メイン.ogg");
+		Sound3 = LoadSoundMem("音楽/合宿QGJ_リザルト.ogg");
+
+		PlaySoundMem(Sound1, DX_PLAYTYPE_LOOP);
 
 		// 作成したデータの識別番号を変数 FontHandle に保存する
 		FontHandle = CreateFontToHandle(NULL, 40, 3, DX_FONTTYPE_ANTIALIASING);
@@ -20,6 +30,7 @@ STATE title() {
 		if (getKeyPress(KEY_INPUT_SPACE,PRESS_ONCE)) {
 			// 作成したフォントデータを削除する
 			DeleteFontToHandle(FontHandle);
+			StopSoundMem(Sound1);
 			return GAME;
 		}
 
@@ -44,8 +55,10 @@ struct Player {
 		// 左向き
 		Direction_Left = 1,
 		// 右向き
-		Direction_Right = 0
+		Direction_Right = 2,
 	} FaceDirection;
+	int AnimationFlame;
+	int CollidedDirection;
 
 	bool OnCollideFromSide(int& tileid, int, int);
 	bool OnCollideFromBottom(int& tileid, int, int);
@@ -61,6 +74,13 @@ bool Player::OnCollideFromSide(int& tileid, int, int) {
 		return true;
 	}
 
+	for (int tileid : { 2, 5, 6, 7, 8 }) {
+		if (tileid == tileid) {
+			// 死亡
+			deathcount2++;
+		}
+	}
+
 	// 返り値を false にすると、あたり判定を無視しない。
 	return false;
 }
@@ -72,8 +92,11 @@ bool Player::OnCollideFromBottom(int& tileid, int, int) {
 		return true;
 	}
 
-	if (tileid == 2) {
-		deathcount2++;
+	for (int id : { 2, 5, 6, 7, 8 }) {
+		if (tileid == id) {
+			// 死亡
+			deathcount2++;
+		}
 	}
 
 	return false;
@@ -89,13 +112,15 @@ bool Player::OnCollideFromTop(int& tileid, int i, int j) {
 		*(tileobjptr - 1) = 2;
 		*(tileobjptr - 15) = 2;
 		*(tileobjptr + 15) = 2;
-	}
-	else if (tileid == 2) {
-		// 死亡
-		deathcount2++;
-	}
-	else if (tileid == 5) {
+	} else if (tileid == 5) {
 		return true;
+	}
+
+	for (int id : { 2, 5, 6, 7, 8 }) {
+		if (tileid == id) {
+			// 死亡
+			deathcount2++;
+		}
 	}
 
 	return false;
@@ -172,7 +197,7 @@ bool IsDrillHit(Player p, Tile t) {
 
 void drillAttack(Tile* drill ) {
 	for (int i = 0; i < drillcount; ++i) {
-		int dir = drill[i].dir;
+			int dir = drill[i].dir;
 		if ( drill[i].flag &&  IsDrillHit(player,drill[i])) {
 			MapTiles[drill[i].x / 32][drill[i].y / 32] = -1;
 			drill[i].dx = -10 * dx[dir];
@@ -210,7 +235,6 @@ void moveBridge(Tile *b) {
 	}
 }
 bool gameflag = false;
-int Sound1, Sound2, Sound3;
 int BackImageHandle, jimen,toge[4], hasi, ballHandle;
 int timer;
 int PlayerImageHandles[3];
@@ -250,10 +274,7 @@ STATE game() {
 		//タイマー
 		timer = 0;
 
-		//音楽のための変数と読み込み
-		Sound1 = LoadSoundMem("音楽/合宿QGJ_タイトル.ogg");
-		Sound2 = LoadSoundMem("音楽/合宿QGJ_メイン.ogg");
-		Sound3 = LoadSoundMem("音楽/合宿QGJ_リザルト.ogg");
+
 
 		// 背景の読み込み
 		BackImageHandle = LoadGraph("Graphic/背景.jpg");
@@ -334,13 +355,16 @@ STATE game() {
 		// 入力に応じて、プレイヤーのスピードを変える
 		if (CheckHitKey(KEY_INPUT_LEFT)) {
 			player.FaceDirection = Player::Direction::Direction_Left;
+			player.AnimationFlame++;
 			player.dx = -2 + player.FloorDeltaX;
 		}
 		else if (CheckHitKey(KEY_INPUT_RIGHT)) {
 			player.FaceDirection = Player::Direction::Direction_Right;
+			player.AnimationFlame++;
 			player.dx = 2 + player.FloorDeltaX;
 		}
 		else {
+			player.AnimationFlame = 0;
 			player.dx = player.FloorDeltaX;
 		}
 
@@ -384,6 +408,8 @@ STATE game() {
 
 		// あたり判定を行う。
 		player.FloorDeltaX = 0;
+		player.CollidedDirection = Direction::None;
+
 		int DefX = player.x, DefY = player.y;
 		int DefDeltaX = player.dx, DefDeltaY = player.dy;
 		CollisionCheck(player, MapTiles, 32, -1);
@@ -391,6 +417,14 @@ STATE game() {
 
 		player.x = DefX; player.y = DefY;
 		CollisionCheck(player, MyMap, -1);
+
+		// 挟まり判定
+		if ((player.CollidedDirection & Direction::LeftAndRight) == Direction::LeftAndRight || (player.CollidedDirection & Direction::UpAndDown) == Direction::UpAndDown) {
+			player.deathcount2++;
+		}
+
+		clsDx();
+		printfDx("%d, dx = %d, dy = %d", player.CollidedDirection, player.dx, player.dy);
 
 		if (DefDeltaX - MyMap.DeltaX > 0) {
 			if (player.x > NewX) {
@@ -510,10 +544,10 @@ STATE game() {
 		}
 
 		if (player.FaceDirection == Player::Direction::Direction_Left) {
-			DrawTurnGraph(player.x, player.y, PlayerImageHandles[0], TRUE);
+			DrawTurnGraph(player.x, player.y, PlayerImageHandles[((player.AnimationFlame / 5) + 1) % 3], TRUE);
 		}
 		else {
-			DrawGraph(player.x, player.y, PlayerImageHandles[0], TRUE);
+			DrawGraph(player.x, player.y, PlayerImageHandles[((player.AnimationFlame / 5) + 1) % 3], TRUE);
 		}
 
 
@@ -521,9 +555,9 @@ STATE game() {
 		unsigned Cr;
 		Cr = GetColor(255, 255, 255);
 
-		DrawFormatString(500, 0, Cr, "Death Count %d", player.deathcount1);
-		DrawFormatString(500, 20, Cr, "Stage %d", stagenum);
-		DrawFormatString(500, 40, Cr, "time %dmin %dsec", (180 - timer/60)/60,60- (timer/60));
+		DrawFormatString(490, 0, Cr, "Death Count %d", player.deathcount1);
+		DrawFormatString(490, 20, Cr, "Stage %d", stagenum);
+		DrawFormatString(490, 40, Cr, "time %dmin %dsec", (180 - timer/60)/60,60- (timer/60));
 
 		if (player.x >= 608 && stagenum < 3) {
 			//マップ移動
@@ -581,8 +615,8 @@ STATE game() {
 		mv.Draw();
 		particle.DrawParticles();
 	}
-		return GAME;
-	}
+	return GAME;
+}
 
 
 bool resultflag = false;

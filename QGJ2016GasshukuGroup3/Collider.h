@@ -105,6 +105,18 @@
 #include <cmath>
 #include <vector>
 
+namespace Direction {
+	enum Direction {
+		None = 0,
+		Left = 1,
+		Right = 2,
+		Up = 4,
+		Down = 8,
+		LeftAndRight = 3,
+		UpAndDown = 12,
+	};
+}
+
 template <class TileType>
 /// <summary>ユーザー定義の MapTileIsEmpty 関数、MapType の Enable, IsEmpty メンバのうち存在するものだけを呼び出す関数オブジェクトを作成します。</summary>
 struct CollisionCheckIsTileEmptyHelper {
@@ -136,6 +148,7 @@ struct CollisionCheckHelper {
 		int last_Y = static_cast<int>((rectX.Y + rectX.Height - 1 - layor.GetY()) / static_cast<double>(layor.GetTileSize()));
 		// std::vector<MapType*> CollidedList;
 		bool IsCanceled = false;
+		int CollidedDirection = Direction::None;
 
 		for (int i = first_X; i <= last_X; i++) {
 			for (int j = first_Y; j <= last_Y; j++) {
@@ -151,9 +164,11 @@ struct CollisionCheckHelper {
 						if (obj.dx - layor.GetDeltaX() > 0) {
 							newX = tilerect.X - rectX.Width - (rectX.X - newX);
 							obj.dx = layor.GetDeltaX();
+							obj.CollidedDirection |= Direction::Right;
 						} else if (obj.dx - layor.GetDeltaX() < 0) {
 							newX = tilerect.X + tilerect.Width - (rectX.X - newX);
 							obj.dx = layor.GetDeltaX();
+							obj.CollidedDirection |= Direction::Left;
 						}
 					}
 
@@ -196,6 +211,7 @@ struct CollisionCheckHelper {
 							newY = tilerect.Y - rectY.Height;
 							obj.dy = layor.GetDeltaY();
 							obj.FloorDeltaX = layor.GetDeltaX();
+							obj.CollidedDirection |= Direction::Down;
 						}
 
 						// CollidedBottomList.push_back(&tile);
@@ -203,6 +219,7 @@ struct CollisionCheckHelper {
 						if (!OnCollideFromTopCaller<Type, MapType>::OnCollideFromTop(obj, tile, i, j)) {
 							newY = tilerect.Y + tilerect.Height;
 							obj.dy = layor.GetDeltaY();
+							obj.CollidedDirection |= Direction::Up;
 						}
 
 						// CollidedTopList.push_back(&tile);
@@ -221,6 +238,8 @@ struct CollisionCheckHelper {
 
 		obj.y = static_cast<decltype(obj.y)>(newY);
 	}
+
+
 };
 
 template <class Type, class MapType>
