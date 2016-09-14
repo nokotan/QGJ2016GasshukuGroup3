@@ -374,7 +374,6 @@ STATE game() {
 			}
 		}
 		gameflag = true;
-		return GAME;
 	}
 	else{
 		// 強制終了コマンド
@@ -869,16 +868,17 @@ void Boss::Update() {
 		}
 		maxhp = hp = 6;
 		player.x = 60, player.y = 100;
+		time = 0;
+		return;
 	}
 	particle.UpdateParticles();
-	if (time >= 270 && !flag) {
+	if (time >= 170 && !flag) {
 		flag = true;
 		time2 = 0;
 		PlaySoundMem(ThrowSound, DX_PLAYTYPE_BACK);
 	}
-	if (time >= 300) {
+	if (time >= 200) {
 		int i, j,k =0,dir;
-		hp = 6;
 		switch (hp)
 		{
 		case 6:
