@@ -20,9 +20,11 @@ STATE title() {
 
 		//音楽のための変数と読み込み
 		Sound1 = LoadSoundMem("音楽/合宿QGJ_タイトル.ogg");
+//		ChangeVolumeSoundMem(216, Sound1);
 		Sound2 = LoadSoundMem("音楽/合宿QGJ_メイン.ogg");
-		ChangeVolumeSoundMem(128, Sound2);
+	//	ChangeVolumeSoundMem(216, Sound2);
 		Sound3 = LoadSoundMem("音楽/合宿QGJ_リザルト.ogg");
+		//ChangeVolumeSoundMem(216, Sound3);
 		KetteiSound = LoadSoundMem("音楽/合宿QGJ_SE_決定音.ogg");
 
 		PlaySoundMem(Sound1, DX_PLAYTYPE_LOOP);
@@ -372,6 +374,14 @@ STATE game() {
 		gameflag = true;
 	}
 	else{
+		// 強制終了コマンド
+		if (CheckHitKey(KEY_INPUT_ESCAPE)) {
+			StopSoundMem(Sound2);
+			PlaySoundMem(Sound1, DX_PLAYTYPE_LOOP);
+			gameflag = false;
+			return TITLE;
+		}
+
 		// メインループ
 		mv.Update();
 		particle.UpdateParticles();
@@ -771,6 +781,7 @@ STATE gameover() {
 	if (!gameoverflag) {
 		gameoverHandle = LoadGraph("Graphic/gameover.png");
 		gameoverflag = true;
+		PlaySoundMem(Sound3, DX_PLAYTYPE_LOOP);
 	}
 	else {
 		DrawGraph(0, 0, gameoverHandle, true);
@@ -781,6 +792,7 @@ STATE gameover() {
 			gameflag = false;
 			bossflag = false;
 			gameoverflag = false;
+			StopSoundMem(Sound3);
 			return TITLE;
 		}
 	}
