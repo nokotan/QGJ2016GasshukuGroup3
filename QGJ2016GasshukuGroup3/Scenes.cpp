@@ -6,6 +6,8 @@
 #include <cmath>
 
 int Sound1, Sound2, Sound3;
+// 決定音
+int KetteiSound;
 
 
 bool titleflag = false;
@@ -18,7 +20,9 @@ STATE title() {
 		//音楽のための変数と読み込み
 		Sound1 = LoadSoundMem("音楽/合宿QGJ_タイトル.ogg");
 		Sound2 = LoadSoundMem("音楽/合宿QGJ_メイン.ogg");
+		ChangeVolumeSoundMem(128, Sound2);
 		Sound3 = LoadSoundMem("音楽/合宿QGJ_リザルト.ogg");
+		KetteiSound = LoadSoundMem("音楽/合宿QGJ_SE_決定音.ogg");
 
 		PlaySoundMem(Sound1, DX_PLAYTYPE_LOOP);
 
@@ -32,6 +36,7 @@ STATE title() {
 			// 作成したフォントデータを削除する
 			DeleteFontToHandle(FontHandle);
 			StopSoundMem(Sound1);
+			PlaySoundMem(KetteiSound, DX_PLAYTYPE_BACK);
 			return GAME;
 		}
 
@@ -87,11 +92,11 @@ bool Player::OnCollideFromSide(int& tileid, int, int) {
 }
 
 bool Player::OnCollideFromBottom(int& tileid, int, int) {
-	fly = 0;//0のとき飛べる
-
 	if (tileid == 3) {
 		return true;
 	}
+
+	fly = 0;//0のとき飛べる
 
 	for (int id : { 5, 6, 7, 8 }) {
 		if (tileid == id) {
@@ -243,6 +248,7 @@ void moveBridge(Tile *b) {
 
 bool gameflag = false;
 int BackImageHandle, jimen,toge[4], hasi, ballHandle;
+int JumpSound, KilledSound;
 int timer;
 int PlayerImageHandles[3];
 CMap MyMap;
@@ -300,6 +306,8 @@ STATE game() {
 			toge[i] = LoadGraph((string("Graphic/toge") + to_string(i)+ ".png").c_str());
 		}
 		ballHandle = LoadGraph("Graphic/ball.png");
+		JumpSound = LoadSoundMem("音楽/合宿QGJ_SE_ジャンプ.ogg");
+		KilledSound = LoadSoundMem("音楽/合宿QGJ_SE_死亡.ogg");
 
 		for (auto& item : Lifts) {
 			item.Reset();
@@ -315,7 +323,7 @@ STATE game() {
 		Lifts[2].X = 32 * 10;
 		Lifts[2].Y = 32 * 4;
 		Lifts[3].MyPattern = Lift::UpAndDown;
-		Lifts[3].X = 0;
+		Lifts[3].X = 32;
 		Lifts[3].Y = 32 * 6;
 		LiftCount = 4;
 
@@ -390,6 +398,7 @@ STATE game() {
 		}
 
 		if (CheckHitKey(KEY_INPUT_SPACE) && player.fly == 0) { // && player.dy == 0) {
+			PlaySoundMem(JumpSound, DX_PLAYTYPE_BACK);
 			player.dy = -20;
 			player.fly = 1;
 		}
@@ -474,6 +483,8 @@ STATE game() {
 
 		//死んだらdeathcountを増やし仕掛けが元に戻る。playerは中間に飛ぶ(死亡処理)
 		if (player.deathcount1 < player.deathcount2) {
+			PlaySoundMem(KilledSound, DX_PLAYTYPE_BACK);
+
 			player.deathcount1 = player.deathcount2;
 			for (int i = 0; i < 30; ++i) {
 				auto p = (new Particle(player.x,player.y));
@@ -584,7 +595,7 @@ STATE game() {
 		DrawFormatString(500, 20, Cr, "Stage %d", stagenum);
 		DrawFormatString(500, 40, Cr, "time %dmin %02dsec", (180 - timer/60)/60, 60 - (timer / 60) % 60 == 60 ? 0 : 60 - (timer / 60) % 60);
 
-		if (player.x >= 608 && stagenum < 3) {
+		if (player.x >= 608 && stagenum < 5) {
 			//マップ移動
 			player.x = 0;
 			++stagenum;
