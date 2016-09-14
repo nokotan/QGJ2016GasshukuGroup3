@@ -42,6 +42,9 @@ public:
 	// 更新
 	void Update();
 
+	// リセット
+	void Reset();
+
 	// あたり判定オブジェクト
 	CMap& GetCollider() {
 		return MyMap;

@@ -302,6 +302,10 @@ STATE game() {
 		}
 		ballHandle = LoadGraph("Graphic/ball.png");
 
+		for (auto& item : Lifts) {
+			item.Reset();
+		}
+
 		Lifts[0].MyPattern = Lift::Side;
 		Lifts[0].X = 0;
 		Lifts[0].Y = 32 * 12;
@@ -426,44 +430,48 @@ STATE game() {
 		int DefDeltaX = player.dx, DefDeltaY = player.dy;
 		CollisionCheck(player, MapTiles, 32, -1);
 		int NewX = player.x, NewY = player.y;
+		int TempCollideDirection = Direction::None;
+		TempCollideDirection = player.CollidedDirection;
 
 		for (int i = 0; i < LiftCount; i++) {
+			player.CollidedDirection = Direction::None;
 			player.x = DefX; player.y = DefY;
 			CollisionCheck(player, Lifts[i].GetCollider(), -1);
 
 			if (DefDeltaX - Lifts[i].GetCollider().DeltaX > 0) {
-				if (player.x <= NewX) {
+				if (static_cast<bool>(player.CollidedDirection & Direction::Right) && player.x <= NewX) {
 					NewX = player.x;
 				}
-			}
-			else {
-				if (player.x >= NewX) {
+			} else if (DefDeltaX - Lifts[i].GetCollider().DeltaX < 0) {
+				if (static_cast<bool>(player.CollidedDirection & Direction::Left) && player.x >= NewX) {
 					NewX = player.x;
 				}
 			}
 
 			if (DefDeltaY - Lifts[i].GetCollider().DeltaY > 0) {
-				if (player.y <= NewY) {
+				if (static_cast<bool>(player.CollidedDirection & Direction::Down) && player.y <= NewY) {
 					NewY = player.y;
 				}
 			}
-			else {
-				if (player.y >= NewY) {
+			else if (DefDeltaY - Lifts[i].GetCollider().DeltaY < 0) {
+				if (static_cast<bool>(player.CollidedDirection & Direction::Up) && player.y >= NewY) {
 					NewY = player.y;
 				}
 			}
+
+			TempCollideDirection |= player.CollidedDirection;
 		}
 
 		player.x = NewX;
 		player.y = NewY;
 
 		// ã≤Ç‹ÇËîªíË
-		if ((player.CollidedDirection & Direction::LeftAndRight) == Direction::LeftAndRight || (player.CollidedDirection & Direction::UpAndDown) == Direction::UpAndDown) {
+		if ((TempCollideDirection & Direction::LeftAndRight) == Direction::LeftAndRight || (TempCollideDirection & Direction::UpAndDown) == Direction::UpAndDown) {
 			player.deathcount2++;
 		}
 
 		clsDx();
-		printfDx("%d, dx = %d, dy = %d", player.CollidedDirection, player.dx, player.dy);
+		printfDx("Player\nCollideDirection : %d\nx : %d\ndx : %d\ndy : %d", player.CollidedDirection, player.x, player.dx, player.dy);
 
 		//éÄÇÒÇæÇÁdeathcountÇëùÇ‚Çµédä|ÇØÇ™å≥Ç…ñﬂÇÈÅBplayerÇÕíÜä‘Ç…îÚÇ‘(éÄñSèàóù)
 		if (player.deathcount1 < player.deathcount2) {
