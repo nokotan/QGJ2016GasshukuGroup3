@@ -41,8 +41,28 @@ bool Object::operator!=(Object* op) {
 	return this != op;
 }
 
+void Rect::Update() {
+	++time;
+	if (pattern) {
+		if (time >= 600) {
+			time = 0;
+			if (pattern == 1) {
+				pattern = 2;
+			}
+			else {
+				pattern = 1;
+			}
+		}
+	}
+}
+
 void Rect::Draw() {
 	DrawGraph(x, y, handle, TRUE);
+}
+
+void Rect::SetPattern(int _p,int _t) {
+	pattern = _p;
+	time = _t;
 }
 
 void Rect::SetHandle(int _h) {
@@ -131,8 +151,8 @@ bool RectCollision3(const Rect& r, const Circle& m){
 		theta[i] = RTOD(atan2(outer, inner));
 	}
 
-	if (0 <= theta[0] && theta[0] <= 90 &&
-		0 <= theta[1] && theta[1] <= 90){
+	if (0 < theta[0] && theta[0] < 90 &&
+		0 < theta[1] && theta[1] < 90){
 		return true;
 	}
 

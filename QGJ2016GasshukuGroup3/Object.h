@@ -23,7 +23,6 @@ using Vector = Pos;
 class Object{
 protected:
 	int handle, num;
-	int time;
 	string path;
 	bool fail,flag;
 public:
@@ -53,17 +52,22 @@ public:
 };
 
 class Rect :public Object{
-	int kind;
 public:
+	int kind,time;
+	int pattern;
 	Pos p[4];
-	Rect(){};
+	Rect() { kind = -1; };
 	Rect(Pos p0, Pos p1, Pos p2, Pos p3){
 		p[0] = p0;//  p0------p1
 		p[1] = p1;//  |		  |
 		p[2] = p2;//  |		  |
 		p[3] = p3;//  p2------p3
+		x = p[0].x;
+		y = p[0].y;
 	};
 	void Draw();
+	void Update();
+	void SetPattern(int,int);
 	void SetHandle(int);
 };
 

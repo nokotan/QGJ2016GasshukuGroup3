@@ -14,17 +14,20 @@ enum STATE {
 class Boss : public Rect{
 	//Handleån
 	const int W = 20, H = 15;
-	int body,arm, bgm;
 	int ax, ay;
 	int hp,maxhp;
 	int pattern;
+	bool gameover,flag = false;
+	Rect p;
 	vector<vector<Rect>> tile;
 public:
+	int body, arm, bgm, time,time2;
 	Boss();
 	void Init();
 	void Update();
 	void Draw();
-	int GetHP();
+	bool IsOver();
+	bool IsEnd();
 };
 
 STATE title();
