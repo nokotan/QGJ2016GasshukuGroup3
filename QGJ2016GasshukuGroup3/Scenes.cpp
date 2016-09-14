@@ -72,11 +72,11 @@ Player player;
 bool Player::OnCollideFromSide(int& tileid, int, int) {
 	x = 0;
 
-	if (tileid == 1 || tileid == 5) {
+	if (tileid == 3) {
 		return true;
 	}
 
-	for (int id : { 2, 5, 6, 7, 8 }) {
+	for (int id : { 5, 6, 7, 8 }) {
 		if (tileid == id) {
 			// €–S
 			deathcount2++;
@@ -90,11 +90,11 @@ bool Player::OnCollideFromSide(int& tileid, int, int) {
 bool Player::OnCollideFromBottom(int& tileid, int, int) {
 	fly = 0;//0‚Ì‚Æ‚«”ò‚×‚é
 
-	if (tileid == 1 || tileid == 5) {
+	if (tileid == 3) {
 		return true;
 	}
 
-	for (int id : { 2, 5, 6, 7, 8 }) {
+	for (int id : { 5, 6, 7, 8 }) {
 		if (tileid == id) {
 			// €–S
 			deathcount2++;
@@ -106,19 +106,19 @@ bool Player::OnCollideFromBottom(int& tileid, int, int) {
 
 bool Player::OnCollideFromTop(int& tileid, int i, int j) {
 
-	if (tileid == 1) {
+	if (tileid == 4) {
 		// ƒuƒƒbƒN‚ğÀ‘Ì‰»
 		tileid = 0;
-		int *tileobjptr = &tileid;
-		*(tileobjptr + 1) = 2;
-		*(tileobjptr - 1) = 2;
-		*(tileobjptr - 15) = 2;
-		*(tileobjptr + 15) = 2;
-	} else if (tileid == 5) {
+		//int *tileobjptr = &tileid;
+		//*(tileobjptr + 1) = 2;
+		//*(tileobjptr - 1) = 2;
+		//*(tileobjptr - 15) = 2;
+		//*(tileobjptr + 15) = 2;
+	} else if (tileid == 3) {
 		return true;
 	}
 
-	for (int id : { 2, 5, 6, 7, 8 }) {
+	for (int id : { 5, 6, 7, 8 }) {
 		if (tileid == id) {
 			// €–S
 			deathcount2++;
