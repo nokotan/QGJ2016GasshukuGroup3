@@ -241,6 +241,7 @@ void moveBridge(Tile *b) {
 		}
 	}
 }
+
 bool gameflag = false;
 int BackImageHandle, jimen,toge[4], hasi, ballHandle;
 int timer;
@@ -249,6 +250,8 @@ CMap MyMap;
 MapViewer mv;
 vector<vector<int>> tmp(MapTilesHeight, vector<int>(MapTilesWidth, -1));
 Particle particle;
+
+
 //初期化する関数
 void Initialization(int map, MapViewer &mv) {
 	player.x = 0;
@@ -257,11 +260,14 @@ void Initialization(int map, MapViewer &mv) {
 	player.height = 64;
 	player.dx = 0;
 	player.dy = 0;
+	//player.deathcount1 = 0;
 
 	player.fly = 0;
 	ballcount = 0;
 	mv.SetData(map);
 }
+
+
 STATE game() {
 	if (!gameflag) {
 		// タイルマップとして使う２次元配列
@@ -280,7 +286,8 @@ STATE game() {
 
 		//タイマー
 		timer = 0;
-
+		//ステージの初期化
+		stagenum = 1;
 
 
 		// 背景の読み込み
@@ -561,10 +568,11 @@ STATE game() {
 		}
 
 
-		// 白色の値を取得
+		// 黒色の値を取得
 		unsigned Cr;
-		Cr = GetColor(255, 255, 255);
+		Cr = GetColor(0, 0, 0);
 
+		//死亡回数、ステージ、残り時間の表示
 		DrawFormatString(500, 0, Cr, "Death Count %d", player.deathcount1);
 		DrawFormatString(500, 20, Cr, "Stage %d", stagenum);
 		DrawFormatString(500, 40, Cr, "time %dmin %dsec", (180 - timer/60)/60,60 - (timer/60)%60);
@@ -723,7 +731,10 @@ STATE result() {
 		DrawFormatStringToHandle(50, 300, GetColor(0, 255, 0), FontHandle, "死亡回数 %3d回\n", player.deathcount2);
 		DrawFormatStringToHandle(50, 350, GetColor(0, 255, 0), FontHandle, "クリア時間 %3.1f秒\n", (double)timer / 60);
 		DrawStringToHandle(100, 400, "PRESS SPACE", GetColor(0, 0, 255), FontHandle2);
+		player.deathcount1 = 0;
+		player.deathcount2 = 0;
 		if (getKeyPress(KEY_INPUT_SPACE, PRESS_ONCE)) {
+			player.deathcount1 = 0;
 			titleflag = false;
 			gameflag = false;
 			resultflag = false;
@@ -744,6 +755,8 @@ STATE gameover() {
 	}
 	else {
 		DrawGraph(0, 0, gameoverHandle, true);
+		player.deathcount1 = 0;
+		player.deathcount2 = 0;
 		if (getKeyPress(KEY_INPUT_SPACE, PRESS_ONCE)) {
 			titleflag = false;
 			gameflag = false;
