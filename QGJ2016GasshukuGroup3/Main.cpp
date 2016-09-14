@@ -33,6 +33,9 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int){
 		case GAMEOVER:
 			nextstate = gameover();
 			break;
+		case SETSUMEI:
+			nextstate = setsumei();
+			break;
 		default:
 			break;
 		}

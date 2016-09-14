@@ -39,7 +39,7 @@ STATE title() {
 			DeleteFontToHandle(FontHandle);
 			StopSoundMem(Sound1);
 			PlaySoundMem(KetteiSound, DX_PLAYTYPE_BACK);
-			return GAME;
+			return SETSUMEI;
 		}
 
 		//タイトル描画
@@ -370,7 +370,7 @@ STATE game() {
 			}
 		}
 		gameflag = true;
-		return BOSS;
+		return GAME;
 	}
 	else{
 		// 強制終了コマンド
@@ -407,7 +407,7 @@ STATE game() {
 			player.dx = player.FloorDeltaX;
 		}
 
-		if (CheckHitKey(KEY_INPUT_SPACE) && player.fly == 0) { // && player.dy == 0) {
+		if ((CheckHitKey(KEY_INPUT_SPACE) || CheckHitKey(KEY_INPUT_UP)) && player.fly == 0) { // && player.dy == 0) {
 			PlaySoundMem(JumpSound, DX_PLAYTYPE_BACK);
 			player.dy = -20;
 			player.fly = 1;
@@ -604,7 +604,15 @@ STATE game() {
 		DrawFormatString(500, 20, Cr, "Stage %d", stagenum);
 		DrawFormatString(500, 40, Cr, "time %dmin %02dsec", (180 - timer/60)/60, 60 - (timer / 60) % 60 == 60 ? 0 : 60 - (timer / 60) % 60);
 
-		if (player.x >= 608 && stagenum < 5) {
+		if (player.x >= 608) {
+			if (stagenum >= 0) {
+				gameflag = false;
+				if (CheckSoundMem(Sound2) == 1) {
+					StopSoundMem(Sound2);
+				}
+				return BOSS;
+			}
+
 			//マップ移動
 			player.x = 0;
 			++stagenum;
@@ -965,6 +973,7 @@ STATE boss() {
 	if (!bossflag) {
 		enemy.Init();
 		bossflag = true;
+		SetLoopPosSoundMem(9600, enemy.bgm);
 		PlaySoundMem(enemy.bgm, DX_PLAYTYPE_LOOP);
 	}
 	else {
