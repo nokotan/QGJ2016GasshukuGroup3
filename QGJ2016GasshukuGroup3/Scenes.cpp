@@ -189,7 +189,10 @@ bool IsDrillHit(Player p, Tile t) {
 			return true;
 		}
 	}
-	else if ((dir == 1 || dir == 3)&& p.y <= t.y + t.height) {
+	else if ((dir == 1)&& p.y <= t.y + t.height && t.x - p.x >= 0 && t.x - p.x < 32 * 3) {
+		return true;
+	}
+	else if (dir == 3 && p.y <= t.y + t.height && p.x - t.x >= 0) {
 		return true;
 	}
 	return false;
@@ -618,6 +621,83 @@ STATE game() {
 	return GAME;
 }
 
+bool bossflag = false;
+
+Boss::Boss() {
+	Init();
+}
+
+void Boss::Init() {
+	body = LoadGraph("Graphic/God.png");
+	arm = LoadGraph("Graphic/GodArm.png");
+	bgm = LoadSoundMem("âπäy/çáèhQGJ_É{ÉXêÌ.ogg");
+	ax = -40, ay = -100;
+	pattern = GetRand(3);
+	time = 0.0;
+	maxhp = hp = 10;
+	tile = vector<vector<Rect>>(W, vector<Rect>(H));
+	for (int i = 0; i < W; ++i) {
+		tile[i][0] = Rect(Pos(i * 32, 0), Pos(i * 32 + 32, 0), Pos(i * 32, 32), Pos(i * 32 + 32, 32));
+		tile[i][0].SetHandle(toge[0]);
+	}
+	for (int i = 0; i < W; ++i) {
+		int j = H - 1;
+		tile[i][j] = Rect(Pos(i * 32, j*32), Pos(i * 32 + 32, j*32), Pos(i * 32, j*32 + 32), Pos(i * 32 + 32, j*32+32));
+		tile[i][j].SetHandle(toge[2]);
+	}
+}
+
+void Boss::Update() {
+	if (hp <= maxhp / 3) {
+		pattern = 3;
+	}
+	switch (pattern)
+	{
+	case 0:
+		break;
+	case 1:
+		break;
+	case 2:
+		break;
+	case 3:
+		break;
+	default:
+		break;
+	}
+}
+
+void Boss::Draw() {
+	DrawGraph(ax, ay, arm, TRUE);
+	DrawGraph(0, 0, body, TRUE);
+	DrawFormatString(500, 0, blue, "%d", hp);
+	for (int i = 0; i < W; ++i) {
+		for (int j = 0; j < H; ++j) {
+			tile[i][j].Draw();
+		}
+	}
+}
+
+int Boss::GetHP() {
+	return hp;
+}
+
+Boss enemy;
+
+STATE boss() {
+	if (!bossflag) {
+		enemy.Init();
+		bossflag = true;
+	}
+	else {
+		enemy.Update();
+		enemy.Draw();
+		if (enemy.GetHP() <= 0) {
+			return RESULT;
+		}
+	}
+	return BOSS;
+}
+
 
 bool resultflag = false;
 int resultHandle;
@@ -660,6 +740,7 @@ STATE gameover() {
 		if (getKeyPress(KEY_INPUT_SPACE, PRESS_ONCE)) {
 			titleflag = false;
 			gameflag = false;
+			bossflag = false;
 			gameoverflag = false;
 			return TITLE;
 		}

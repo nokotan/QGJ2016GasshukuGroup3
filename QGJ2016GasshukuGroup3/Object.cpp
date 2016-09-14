@@ -10,14 +10,14 @@ Object::Object(double _x, double _y, char* _path) :x(_x), y(_y), path(_path){
 	flag = false;
 };
 
-void Object::Update(Object* obj){
-	if (obj->InMouseClick()){
-		obj->flag = !obj->flag;
+void Object::Update(){
+	if (InMouseClick()){
+		flag = !flag;
 	}
 }
 
-void Object::Draw(Object* obj){
-	DrawGraph(obj->x, obj->y, obj->handle, TRUE);
+void Object::Draw(){
+	DrawGraph(x, y, handle, TRUE);
 }
 
 bool Object::InMouseClick(){
@@ -39,6 +39,14 @@ void Object::PosSet(Pos p) {
 
 bool Object::operator!=(Object* op) {
 	return this != op;
+}
+
+void Rect::Draw() {
+	DrawGraph(x, y, handle, TRUE);
+}
+
+void Rect::SetHandle(int _h) {
+	handle = _h;
 }
 
 //â~Ç∆â~ÇÃê⁄êGîªíË
