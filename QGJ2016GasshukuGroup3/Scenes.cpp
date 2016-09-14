@@ -870,11 +870,11 @@ void Boss::Update() {
 		return;
 	}
 	particle.UpdateParticles();
-	if (time >= 270 && !flag) {
+	if (time >= 170 && !flag) {
 		flag = true;
 		time2 = 0;
 	}
-	if (time >= 300) {
+	if (time >= 200) {
 		int i, j,k =0,dir;
 		switch (hp)
 		{
