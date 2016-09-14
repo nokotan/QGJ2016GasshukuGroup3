@@ -2,6 +2,8 @@
 #include "Collider.h"
 #include "MapEditor.h"
 #include "Scenes.h"
+#include "Lift.h"
+
 #include <cmath>
 
 int Sound1, Sound2, Sound3;
@@ -70,12 +72,12 @@ Player player;
 bool Player::OnCollideFromSide(int& tileid, int, int) {
 	x = 0;
 
-	if (tileid == 1 || tileid == 5) {
+	if (tileid == 3) {
 		return true;
 	}
 
-	for (int tileid : { 2, 5, 6, 7, 8 }) {
-		if (tileid == tileid) {
+	for (int id : { 5, 6, 7, 8 }) {
+		if (tileid == id) {
 			// éÄñS
 			deathcount2++;
 		}
@@ -88,11 +90,11 @@ bool Player::OnCollideFromSide(int& tileid, int, int) {
 bool Player::OnCollideFromBottom(int& tileid, int, int) {
 	fly = 0;//0ÇÃÇ∆Ç´îÚÇ◊ÇÈ
 
-	if (tileid == 1 || tileid == 5) {
+	if (tileid == 3) {
 		return true;
 	}
 
-	for (int id : { 2, 5, 6, 7, 8 }) {
+	for (int id : { 5, 6, 7, 8 }) {
 		if (tileid == id) {
 			// éÄñS
 			deathcount2++;
@@ -104,19 +106,19 @@ bool Player::OnCollideFromBottom(int& tileid, int, int) {
 
 bool Player::OnCollideFromTop(int& tileid, int i, int j) {
 
-	if (tileid == 1) {
+	if (tileid == 4) {
 		// ÉuÉçÉbÉNÇé¿ëÃâª
 		tileid = 0;
-		int *tileobjptr = &tileid;
-		*(tileobjptr + 1) = 2;
-		*(tileobjptr - 1) = 2;
-		*(tileobjptr - 15) = 2;
-		*(tileobjptr + 15) = 2;
-	} else if (tileid == 5) {
+		//int *tileobjptr = &tileid;
+		//*(tileobjptr + 1) = 2;
+		//*(tileobjptr - 1) = 2;
+		//*(tileobjptr - 15) = 2;
+		//*(tileobjptr + 15) = 2;
+	} else if (tileid == 3) {
 		return true;
 	}
 
-	for (int id : { 2, 5, 6, 7, 8 }) {
+	for (int id : { 5, 6, 7, 8 }) {
 		if (tileid == id) {
 			// éÄñS
 			deathcount2++;
@@ -136,6 +138,7 @@ Tile ball[TILE_MAX];
 Tile bridge[TILE_MAX];
 Tile drill[TILE_MAX];
 Tile invis[TILE_MAX];
+Lift Lifts[TILE_MAX];
 
 int stagenum = 1;
 
@@ -143,13 +146,14 @@ static int ballcount = 0;
 static int bcount = 0;
 static int drillcount = 0;
 static int inviscount = 0;
+static int LiftCount = 0;
 
 //1ÇÕìGÇQÇÕé©ã@ÅAÇ†ÇΩÇËîªíË
 bool Checkhitchery(int x1, int y1, int width1, int height1, int x2, int y2, int width2, int height2) {
-	if (x1 <= (x2 + width2)) {
-		if ((x1 + width1) >= x2) {
-			if (y1 <= (y2 + height2) ) {
-				if ((y1 + height1) >= y2) {
+	if (x1 < (x2 + width2)) {
+		if ((x1 + width1) > x2) {
+			if (y1 < (y2 + height2) ) {
+				if ((y1 + height1) >y2) {
 					return true;
 				}
 				return false;
@@ -290,16 +294,20 @@ STATE game() {
 			toge[i] = LoadGraph((string("Graphic/toge") + to_string(i)+ ".png").c_str());
 		}
 		ballHandle = LoadGraph("Graphic/ball.png");
-		MyMap.Create(30, 30);
-		MyMap.Fill(-1);
 
-		for (int i : { 10, 11, 12, 13, 14, 15 }) {
-			MyMap[i][12] = 0;
-		}
-
-		MyMap.X = -10 * 32;
-		MyMap.Y = 0;
-		MyMap.DeltaX = 2; MyMap.DeltaY = 0;
+		Lifts[0].MyPattern = Lift::Side;
+		Lifts[0].X = 0;
+		Lifts[0].Y = 32 * 12;
+		Lifts[1].MyPattern = Lift::Side;
+		Lifts[1].X = 32 * 6;
+		Lifts[1].Y = 32 * 6;
+		Lifts[2].MyPattern = Lift::Rotation;
+		Lifts[2].X = 32 * 10;
+		Lifts[2].Y = 32 * 4;
+		Lifts[3].MyPattern = Lift::UpAndDown;
+		Lifts[3].X = 0;
+		Lifts[3].Y = 32 * 6;
+		LiftCount = 4;
 
 		// player Çèâä˙âª
 		mv = MapViewer(1);
@@ -371,7 +379,7 @@ STATE game() {
 			player.dx = player.FloorDeltaX;
 		}
 
-		if (CheckHitKey(KEY_INPUT_SPACE) && player.fly == 0 && player.dy == 0) {
+		if (CheckHitKey(KEY_INPUT_SPACE) && player.fly == 0) { // && player.dy == 0) {
 			player.dy = -20;
 			player.fly = 1;
 		}
@@ -399,15 +407,9 @@ STATE game() {
 
 		//}
 
-		if (MyMap.X < -10 * 32) {
-			MyMap.DeltaX = 2;
+		for (int i = 0; i < LiftCount; i++) {
+			Lifts[i].Update();
 		}
-		else if (MyMap.X > -6 * 32) {
-			MyMap.DeltaX = -2;
-		}
-
-		MyMap.X += MyMap.DeltaX;
-		MyMap.Y += MyMap.DeltaY;
 
 		// Ç†ÇΩÇËîªíËÇçsÇ§ÅB
 		player.FloorDeltaX = 0;
@@ -418,8 +420,35 @@ STATE game() {
 		CollisionCheck(player, MapTiles, 32, -1);
 		int NewX = player.x, NewY = player.y;
 
-		player.x = DefX; player.y = DefY;
-		CollisionCheck(player, MyMap, -1);
+		for (int i = 0; i < LiftCount; i++) {
+			player.x = DefX; player.y = DefY;
+			CollisionCheck(player, Lifts[i].GetCollider(), -1);
+
+			if (DefDeltaX - Lifts[i].GetCollider().DeltaX > 0) {
+				if (player.x <= NewX) {
+					NewX = player.x;
+				}
+			}
+			else {
+				if (player.x >= NewX) {
+					NewX = player.x;
+				}
+			}
+
+			if (DefDeltaY - Lifts[i].GetCollider().DeltaY > 0) {
+				if (player.y <= NewY) {
+					NewY = player.y;
+				}
+			}
+			else {
+				if (player.y >= NewY) {
+					NewY = player.y;
+				}
+			}
+		}
+
+		player.x = NewX;
+		player.y = NewY;
 
 		// ã≤Ç‹ÇËîªíË
 		if ((player.CollidedDirection & Direction::LeftAndRight) == Direction::LeftAndRight || (player.CollidedDirection & Direction::UpAndDown) == Direction::UpAndDown) {
@@ -428,30 +457,6 @@ STATE game() {
 
 		clsDx();
 		printfDx("%d, dx = %d, dy = %d", player.CollidedDirection, player.dx, player.dy);
-
-		if (DefDeltaX - MyMap.DeltaX > 0) {
-			if (player.x > NewX) {
-				player.x = NewX;
-			}
-		}
-		else {
-			if (player.x < NewX) {
-				player.x = NewX;
-			}
-		}
-
-		if (DefDeltaY - MyMap.DeltaY > 0) {
-			if (player.y > NewY) {
-				player.y = NewY;
-			}
-		}
-		else {
-			if (player.y < NewY) {
-				player.y = NewY;
-			}
-		}
-
-
 
 		//éÄÇÒÇæÇÁdeathcountÇëùÇ‚Çµédä|ÇØÇ™å≥Ç…ñﬂÇÈÅBplayerÇÕíÜä‘Ç…îÚÇ‘(éÄñSèàóù)
 		if (player.deathcount1 < player.deathcount2) {
@@ -537,11 +542,13 @@ STATE game() {
 				DrawGraph(invis[i].x, invis[i].y, jimen, TRUE);
 		}
 
-		for (int i = 0; i < MyMap.Cols(); i++) {
-			for (int j = 0; j < MyMap.Rows(); j++) {
-				if (MyMap[i][j] != -1 && MyMap[i][j] != 1) {
-					DrawGraph(MyMap.X + i * 32, MyMap.Y + j * 32, jimen, TRUE);
-					// DrawBox(MyMap.X + i * 32, MyMap.Y + j * 32, MyMap.X + i * 32 + 32, MyMap.Y + j * 32 + 32, GetColor(0, 216, 0), TRUE);
+		for (int index = 0; index < LiftCount; index++) {
+			for (int i = 0; i < Lifts[index].GetCollider().Cols(); i++) {
+				for (int j = 0; j < Lifts[index].GetCollider().Rows(); j++) {
+					if (Lifts[index].GetCollider()[i][j] != -1 && Lifts[index].GetCollider()[i][j] != 1) {
+						DrawGraph(Lifts[index].GetCollider().X + i * 32, Lifts[index].GetCollider().Y + j * 32, jimen, TRUE);
+						// DrawBox(MyMap.X + i * 32, MyMap.Y + j * 32, MyMap.X + i * 32 + 32, MyMap.Y + j * 32 + 32, GetColor(0, 216, 0), TRUE);
+					}
 				}
 			}
 		}
@@ -558,9 +565,9 @@ STATE game() {
 		unsigned Cr;
 		Cr = GetColor(255, 255, 255);
 
-		DrawFormatString(490, 0, Cr, "Death Count %d", player.deathcount1);
-		DrawFormatString(490, 20, Cr, "Stage %d", stagenum);
-		DrawFormatString(490, 40, Cr, "time %dmin %dsec", (180 - timer/60)/60,60- (timer/60));
+		DrawFormatString(500, 0, Cr, "Death Count %d", player.deathcount1);
+		DrawFormatString(500, 20, Cr, "Stage %d", stagenum);
+		DrawFormatString(500, 40, Cr, "time %dmin %dsec", (180 - timer/60)/60,60 - (timer/60)%60);
 
 		if (player.x >= 608 && stagenum < 3) {
 			//É}ÉbÉvà⁄ìÆ
@@ -714,7 +721,7 @@ STATE result() {
 		DrawGraph(0, 0, resultHandle, false);
 		//DrawFormatString(50, 240, GetColor(0, 0, 0), "éÄñSâÒêî %d\n", player.deathcount2);
 		DrawFormatStringToHandle(50, 300, GetColor(0, 255, 0), FontHandle, "éÄñSâÒêî %3dâÒ\n", player.deathcount2);
-		DrawFormatStringToHandle(50, 350, GetColor(0, 255, 0), FontHandle, "ÉNÉäÉAéûä‘ %3.0fïb\n", (double)timer / 60);
+		DrawFormatStringToHandle(50, 350, GetColor(0, 255, 0), FontHandle, "ÉNÉäÉAéûä‘ %3.1fïb\n", (double)timer / 60);
 		DrawStringToHandle(100, 400, "PRESS SPACE", GetColor(0, 0, 255), FontHandle2);
 		if (getKeyPress(KEY_INPUT_SPACE, PRESS_ONCE)) {
 			titleflag = false;
