@@ -138,6 +138,7 @@ struct CollisionCheckHelper {
 
 	static void CollisionCheck(Type& obj, IMapTileLayor<MapType>& layor, IsTileEmpty EmptyCheck) {
 		Pixel newX = static_cast<Pixel>(obj.x + obj.dx);
+		Pixel newDx = static_cast<Pixel>(obj.dx);
 		Rectangle_t rectX = GetCollideRectangeCaller<Type>::GetCollideRectangle(obj);
 		rectX.X += static_cast<Pixel>(obj.dx);
 		rectX.Y += layor.GetDeltaY();
@@ -162,12 +163,12 @@ struct CollisionCheckHelper {
 				if (!is_empty && rectX.IntersectWith(tilerect)) {
 					if (!OnCollideFromSideCaller<Type, MapType>::OnCollideFromSide(obj, tile, i, j)) {
 						if (obj.dx - layor.GetDeltaX() > 0) {
-							newX = tilerect.X - rectX.Width - (rectX.X - newX);
-							obj.dx = layor.GetDeltaX();
+							newX = tilerect.X - rectX.Width;// -(rectX.X - newX);
+							newDx = layor.GetDeltaX();
 							obj.CollidedDirection |= Direction::Right;
 						} else if (obj.dx - layor.GetDeltaX() < 0) {
-							newX = tilerect.X + tilerect.Width - (rectX.X - newX);
-							obj.dx = layor.GetDeltaX();
+							newX = tilerect.X + tilerect.Width;// -(rectX.X - newX);
+							newDx = layor.GetDeltaX();
 							obj.CollidedDirection |= Direction::Left;
 						} else {
 							obj.CollidedDirection |= Direction::LeftAndRight;
@@ -181,6 +182,7 @@ struct CollisionCheckHelper {
 
 		if (!IsCanceled) {
 			obj.x = static_cast<decltype(obj.x)>(newX);
+			obj.dx = static_cast<decltype(obj.dx)>(newDx);
 		}
 
 		//for (MapType* val : CollidedList) {
@@ -188,6 +190,7 @@ struct CollisionCheckHelper {
 		//}
 
 		Pixel newY = static_cast<Pixel>(obj.y + obj.dy);
+		Pixel newDy = static_cast<Pixel>(obj.dy);
 		Rectangle_t rectY = GetCollideRectangeCaller<Type>::GetCollideRectangle(obj);
 		rectY.Y += static_cast<Pixel>(obj.dy);
 
@@ -211,7 +214,7 @@ struct CollisionCheckHelper {
 					if (obj.dy - layor.GetDeltaY() > 0) {
 						if (!OnCollideFromBottomCaller<Type, MapType>::OnCollideFromBottom(obj, tile, i, j)) {
 							newY = tilerect.Y - rectY.Height;
-							obj.dy = layor.GetDeltaY();
+							newDy = layor.GetDeltaY();
 							obj.FloorDeltaX = layor.GetDeltaX();
 							obj.CollidedDirection |= Direction::Down;
 						}
@@ -220,7 +223,7 @@ struct CollisionCheckHelper {
 					} else if (obj.dy - layor.GetDeltaY() < 0) {
 						if (!OnCollideFromTopCaller<Type, MapType>::OnCollideFromTop(obj, tile, i, j)) {
 							newY = tilerect.Y + tilerect.Height;
-							obj.dy = layor.GetDeltaY();
+							newDy = layor.GetDeltaY();
 							obj.CollidedDirection |= Direction::Up;
 						}
 
@@ -239,6 +242,8 @@ struct CollisionCheckHelper {
 		//}
 
 		obj.y = static_cast<decltype(obj.y)>(newY);
+		obj.dy = static_cast<decltype(obj.dy)>(newDy);
+
 	}
 
 
