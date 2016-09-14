@@ -492,8 +492,8 @@ STATE game() {
 			player.deathcount2++;
 		}
 
-		clsDx();
-		printfDx("Player\nCollideDirection : %d\nx : %d\ndx : %d\ndy : %d", player.CollidedDirection, player.x, player.dx, player.dy);
+		// clsDx();
+		// printfDx("Player\nCollideDirection : %d\nx : %d\ndx : %d\ndy : %d", player.CollidedDirection, player.x, player.dx, player.dy);
 
 		//€‚ñ‚¾‚çdeathcount‚ğ‘‚â‚µdŠ|‚¯‚ªŒ³‚É–ß‚éBplayer‚Í’†ŠÔ‚É”ò‚Ô(€–Sˆ—)
 		if (player.deathcount1 < player.deathcount2) {
